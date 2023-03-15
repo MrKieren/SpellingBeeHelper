@@ -10,5 +10,16 @@
     "32": "spelling_bee_icon_32.png",
     "48": "spelling_bee_icon_48.png",
     "128": "spelling_bee_icon_128.png"
-  }
+  },
+  "content_scripts": [
+    {
+      "run_at": "document_end",
+      "matches": [
+        "https://*.nytimes.com/*"
+      ],
+      "js": [
+        "./static/js/content.js"
+      ]
+    }
+  ]
 }
