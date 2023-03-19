@@ -19,6 +19,9 @@
       ],
       "js": [
         "./static/js/content.js"
+      ],
+      "css": [
+        "./css/style.css"
       ]
     }
   ]

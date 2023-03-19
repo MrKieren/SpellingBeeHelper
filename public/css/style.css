@@ -1,0 +1,25 @@
+.table {
+    text-align: center;
+    text-transform: uppercase;
+    width: auto;
+    margin-bottom: 1rem;
+    font-size: 1.125rem;
+    line-height: 1.5625rem;
+}
+
+.row {
+    height: 30px;
+}
+
+.cell {
+    width: 30px;
+    min-width: 30px;
+    max-width: 30px;
+}
+
+td:first-child,
+td:last-child,
+tr:first-child,
+tr:last-child {
+    font-weight: 700;
+}
