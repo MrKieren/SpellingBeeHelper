@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import ReactDOM from "react-dom"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
@@ -17,10 +17,67 @@ const SpellingBee = () => {
     const [foundTwoLetterCounts, setFoundTwoLetterCounts] =
         useState(new Map<string, number>())
 
-    const Update = async () => {
+    const WatchEnterButton = useCallback(() => {
+        const submitButton =
+            document.getElementsByClassName("hive-action__submit")
+        if (submitButton == null || submitButton.length !== 1) {
+            console.log("Failed to find submit button.")
+            return
+        }
+
+        const observer = new MutationObserver((mutation) => {
+            const submitButtonTarget = mutation[0].target as Element
+            if (submitButtonTarget.classList.contains("push-active") ||
+                submitButtonTarget.classList.contains("action-active")) {
+                UpdateFoundWords()
+            }
+        })
+
+        observer.observe(submitButton[0], {
+            attributes: true,
+            attributeFilter: ["class"],
+            childList: false,
+            characterData: false
+        })
+    }, [])
+
+    const FetchData = useCallback(async function() {
+        try {
+            const response = await fetch(
+                `https://www.nytimes.com/${CurrentDate()}/crosswords/spelling-bee-forum.html`
+            )
+            if (!response.ok) {
+                throw new Error(`HTTPS error status: ${response.status}`)
+            }
+
+            const html = await response.text()
+
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(html, "text/html")
+
+            const interactiveBody =
+                doc.getElementsByClassName("interactive-body")
+            if (interactiveBody == null || interactiveBody.length !== 1) {
+                console.log("Failed to find interactive body.")
+                return
+            }
+
+            ParseSpellingBeeGrid(interactiveBody[0])
+            ParseTwoLetterList(interactiveBody[0])
+        } catch (error) {
+            console.error(error);
+        }
+    }, [])
+
+    const Update = useCallback(async () => {
         await FetchData()
         UpdateFoundWords()
-    }
+    }, [FetchData])
+
+    useEffect(() => {
+        Update()
+        WatchEnterButton()
+    }, [WatchEnterButton, Update])
 
     const UpdateFoundWords = () => {
         const wordList = document.getElementsByClassName("sb-has-words")
@@ -67,34 +124,6 @@ const SpellingBee = () => {
 
         setFoundLetterCounts(letterCounts)
         setFoundTwoLetterCounts(twoLetterCounts)
-    }
-
-    const FetchData = async () => {
-        try {
-            const response = await fetch(
-                `https://www.nytimes.com/${CurrentDate()}/crosswords/spelling-bee-forum.html`
-            )
-            if (!response.ok) {
-                throw new Error(`HTTPS error status: ${response.status}`)
-            }
-
-            const html = await response.text()
-
-            const parser = new DOMParser()
-            const doc = parser.parseFromString(html, "text/html")
-
-            const interactiveBody =
-                doc.getElementsByClassName("interactive-body")
-            if (interactiveBody == null || interactiveBody.length !== 1) {
-                console.log("Failed to find interactive body.")
-                return
-            }
-
-            ParseSpellingBeeGrid(interactiveBody[0])
-            ParseTwoLetterList(interactiveBody[0])
-        } catch (error) {
-            console.error(error);
-        }
     }
 
     const CurrentDate = () => {
