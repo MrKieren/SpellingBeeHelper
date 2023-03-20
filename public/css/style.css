@@ -23,3 +23,7 @@ tr:first-child,
 tr:last-child {
     font-weight: 700;
 }
+
+.bold {
+    font-weight: 700;
+}

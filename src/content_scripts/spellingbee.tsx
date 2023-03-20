@@ -6,10 +6,16 @@ export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 const SpellingBee = () => {
     const [requiredWordLengths, setRequiredWordLengths] =
         useState(new Array<number>())
+
     const [requiredLetterCounts, setRequiredLetterCounts] =
         useState(new Map<string, Map<number, number>>())
     const [foundLetterCounts, setFoundLetterCounts] =
         useState(new Map<string, Map<number, number>>())
+
+    const [requiredTwoLetterCounts, setRequiredTwoLetterCounts] =
+        useState(new Map<string, number>())
+    const [foundTwoLetterCounts, setFoundTwoLetterCounts] =
+        useState(new Map<string, number>())
 
     const Update = async () => {
         await FetchData()
@@ -30,6 +36,7 @@ const SpellingBee = () => {
         }
 
         const letterCounts = new Map<string, Map<number, number>>()
+        const twoLetterCounts = new Map<string, number>()
 
         for (let index = 0; index < words.length; index++) {
             const child = words[index]
@@ -45,11 +52,21 @@ const SpellingBee = () => {
                 letterCounts.get(firstLetter)?.set(word.length, 0)
             }
 
-            const count = letterCounts.get(firstLetter)?.get(word.length) ?? 0
-            letterCounts.get(firstLetter)?.set(word.length, count + 1)
+            const letterCount =
+                letterCounts.get(firstLetter)?.get(word.length) ?? 0
+            letterCounts.get(firstLetter)?.set(word.length, letterCount + 1)
+
+            const firstTwoLetters = word[0] + word[1]
+            if (!twoLetterCounts.has(firstTwoLetters)) {
+                twoLetterCounts.set(firstTwoLetters, 0)
+            }
+
+            const twoLetterCount = twoLetterCounts.get(firstTwoLetters) ?? 0
+            twoLetterCounts.set(firstTwoLetters, twoLetterCount + 1)
         }
 
         setFoundLetterCounts(letterCounts)
+        setFoundTwoLetterCounts(twoLetterCounts)
     }
 
     const FetchData = async () => {
@@ -164,7 +181,7 @@ const SpellingBee = () => {
             }
         }
 
-        return twoLetterCounts
+        setRequiredTwoLetterCounts(twoLetterCounts)
     }
 
     const CalculateWordCount = () => {
@@ -195,6 +212,28 @@ const SpellingBee = () => {
         </>
     }
 
+    const CalculateTwoLetterCount = () => {
+        const updatedCounters = new Map<string, number>()
+
+        requiredTwoLetterCounts.forEach((count, letters) => {
+            const foundCount = foundTwoLetterCounts.get(letters) ?? 0
+            updatedCounters.set(letters, count - foundCount)
+        })
+
+        return <>
+            <ul>
+                {Array.from(updatedCounters).sort().map(([letters, count]) => (
+                    <>
+                        <li>
+                            <span className="bold">{letters}: &nbsp;</span>
+                            {count}
+                        </li>
+                    </>
+                ))}
+            </ul>
+        </>
+    }
+
     const SpellingBeeGrid = () => {
         return <table className="table">
             <tbody>
@@ -218,6 +257,8 @@ const SpellingBee = () => {
         </span>
 
         <SpellingBeeGrid />
+
+        <CalculateTwoLetterCount />
 
         <button onClick={Update}>Update</button>
     </>
