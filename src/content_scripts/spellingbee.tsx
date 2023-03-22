@@ -32,7 +32,7 @@ const SpellingBee = () => {
             const submitButtonTarget = mutation[0].target as Element
             if (submitButtonTarget.classList.contains("push-active") ||
                 submitButtonTarget.classList.contains("action-active")) {
-                UpdateFoundWords()
+                updateFoundWords()
             }
         })
 
@@ -44,10 +44,10 @@ const SpellingBee = () => {
         })
     }, [])
 
-    const FetchData = useCallback(async function () {
+    const fetchData = useCallback(async function () {
         try {
             const response = await fetch(
-                `https://www.nytimes.com/${CurrentDate()}/crosswords/spelling-bee-forum.html`
+                `https://www.nytimes.com/${currentDate()}/crosswords/spelling-bee-forum.html`
             )
             if (!response.ok) {
                 throw new Error(`HTTPS error status: ${response.status}`)
@@ -65,24 +65,24 @@ const SpellingBee = () => {
                 return
             }
 
-            ParseSpellingBeeGrid(interactiveBody[0])
-            ParseTwoLetterList(interactiveBody[0])
+            parseSpellingBeeGrid(interactiveBody[0])
+            parseTwoLetterList(interactiveBody[0])
         } catch (error) {
             console.error(error);
         }
     }, [])
 
-    const Update = useCallback(async () => {
-        await FetchData()
-        UpdateFoundWords()
-    }, [FetchData])
+    const update = useCallback(async () => {
+        await fetchData()
+        updateFoundWords()
+    }, [fetchData])
 
     useEffect(() => {
-        Update()
+        update()
         WatchEnterButton()
-    }, [WatchEnterButton, Update])
+    }, [WatchEnterButton, update])
 
-    const UpdateFoundWords = () => {
+    function updateFoundWords() {
         const wordList = document.getElementsByClassName("sb-has-words")
         if (wordList == null) {
             console.log("Failed to find word list.")
@@ -139,7 +139,7 @@ const SpellingBee = () => {
         setFoundWordLengths(wordLengthCounts)
     }
 
-    const CurrentDate = () => {
+    function currentDate() {
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, "0");
@@ -148,7 +148,7 @@ const SpellingBee = () => {
         return `${year}/${month}/${day}`;
     }
 
-    const ParseSpellingBeeGrid = (interactiveBody: Element) => {
+    function parseSpellingBeeGrid(interactiveBody: Element) {
         const grid = interactiveBody.getElementsByTagName("table")
         if (grid == null || grid.length !== 1) {
             console.log("Failed to find Spelling Bee Grid.")
@@ -197,7 +197,7 @@ const SpellingBee = () => {
         setRequiredLetterCounts(letterCounts)
     }
 
-    const ParseTwoLetterList = (interactiveBody: Element) => {
+    function parseTwoLetterList(interactiveBody: Element) {
         const pElements = interactiveBody.getElementsByTagName("p")
         if (pElements === null || pElements.length === 0) {
             console.log("Failed to find two letter list.")
@@ -226,7 +226,7 @@ const SpellingBee = () => {
         setRequiredTwoLetterCounts(twoLetterCounts)
     }
 
-    const CalculateWordCount = () => {
+    function CalculateWordCount() {
         const updatedCounters = new Map<string, Map<number, number>>()
         var wordRunningCount = 0
 
@@ -280,7 +280,7 @@ const SpellingBee = () => {
         </>
     }
 
-    const CalculateTwoLetterCount = () => {
+    function CalculateTwoLetterCount() {
         const updatedCounters: JSX.Element[] = []
 
         var currentFirstLetter = "a"
@@ -326,7 +326,7 @@ const SpellingBee = () => {
         </>
     }
 
-    const SpellingBeeGrid = () => {
+    function SpellingBeeGrid() {
         return <>
             <div className="spelling-bee-helper-grid">
                 <p className="spelling-bee-helper-title">
@@ -359,7 +359,7 @@ const SpellingBee = () => {
     </>
 }
 
-const Render = () => {
+function render() {
     const contentBox = document.getElementsByClassName("sb-content-box")
     if (contentBox == null || contentBox.length !== 1) {
         console.log("Failed to find content box.")
@@ -379,6 +379,6 @@ const Render = () => {
 }
 
 console.log("Loading Spelling Bee Helper.")
-Render()
+render()
 
 export default SpellingBee
