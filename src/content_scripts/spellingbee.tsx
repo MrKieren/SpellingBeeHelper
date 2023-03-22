@@ -1,3 +1,4 @@
+import React from "react"
 import { useCallback, useEffect, useState } from "react"
 import ReactDOM from "react-dom"
 
@@ -41,7 +42,7 @@ const SpellingBee = () => {
         })
     }, [])
 
-    const FetchData = useCallback(async function() {
+    const FetchData = useCallback(async function () {
         try {
             const response = await fetch(
                 `https://www.nytimes.com/${CurrentDate()}/crosswords/spelling-bee-forum.html`
@@ -233,7 +234,9 @@ const SpellingBee = () => {
                     <tr>
                         <td className="cell">{letter}</td>
                         {Array.from(counts).map(([wordLength, count]) => (
-                            <td className="cell">{count}</td>
+                            <td className="cell">
+                                {count === 0 ? "-" : count}
+                            </td>
                         ))}
                     </tr>
                 </>
@@ -242,54 +245,81 @@ const SpellingBee = () => {
     }
 
     const CalculateTwoLetterCount = () => {
-        const updatedCounters = new Map<string, number>()
+        const updatedCounters: JSX.Element[] = []
+
+        var currentFirstLetter = "a"
+        var currentRow = <></>
 
         requiredTwoLetterCounts.forEach((count, letters) => {
+            if (letters[0] !== currentFirstLetter) {
+                updatedCounters.push(currentRow)
+
+                currentFirstLetter = letters[0]
+                currentRow = <></>
+            }
+
             const foundCount = foundTwoLetterCounts.get(letters) ?? 0
-            updatedCounters.set(letters, count - foundCount)
+
+            currentRow = React.cloneElement(
+                currentRow,
+                {},
+                [
+                    currentRow,
+                    <span className="two-letter-list-item">
+                        {letters.toUpperCase()}-{count - foundCount}
+                    </span>
+                ]
+            )
         })
 
         return <>
-            <ul>
-                {Array.from(updatedCounters).sort().map(([letters, count]) => (
-                    <>
-                        <li>
-                            <span className="bold">{letters}: &nbsp;</span>
-                            {count}
-                        </li>
-                    </>
-                ))}
-            </ul>
+            <div className="two-letter-list">
+                <p className="spelling-bee-helper-title">Two letter list</p>
+                <ul>
+                    {updatedCounters.map((count) => (
+                        <>
+                            <li>
+                                <span className="two-letter-list-row">
+                                    {count}
+                                </span>
+                            </li>
+                        </>
+                    ))}
+                </ul>
+            </div>
         </>
     }
 
     const SpellingBeeGrid = () => {
-        return <table className="table">
-            <tbody>
-                <tr className="row">
-                    <>
-                        <td className="cell"></td>
-                        {Array.from(requiredWordLengths).map(value => (
-                            <td className="cell">{value}</td>
-                        ))}
-                    </>
-                    <td className="cell">Σ</td>
-                </tr>
-                <CalculateWordCount />
-            </tbody>
-        </table>
+        return <>
+            <div className="spelling-bee-helper-grid">
+                <p className="spelling-bee-helper-title">
+                    Spelling Bee Grid
+                </p>
+
+                <table className="table">
+                    <tbody>
+                        <tr className="row">
+                            <>
+                                <td className="cell"></td>
+                                {Array.from(requiredWordLengths).map(value => (
+                                    <td className="cell">{value}</td>
+                                ))}
+                            </>
+                            <td className="cell">Σ</td>
+                        </tr>
+                        <CalculateWordCount />
+                    </tbody>
+                </table>
+            </div>
+        </>
     }
 
     return <>
-        <span className="spelling-bee-helper-header">
-            Spelling Bee Helper
-        </span>
-
-        <SpellingBeeGrid />
-
-        <CalculateTwoLetterCount />
-
-        <button onClick={Update}>Update</button>
+        <div className="spelling-bee-helper sb-wordlist-box">
+            <SpellingBeeGrid />
+            <CalculateTwoLetterCount />
+        </div>
     </>
 }
 

@@ -1,3 +1,8 @@
+.spelling-bee-helper {
+    margin-top: 70px;
+    font-family: "nyt-imperial"
+}
+
 .table {
     text-align: center;
     text-transform: uppercase;
@@ -26,4 +31,31 @@ tr:last-child {
 
 .bold {
     font-weight: 700;
+}
+
+.spelling-bee-helper-grid {
+    font-family: "nyt-imperial";
+    font-size: 1.25rem;
+    font-weight: 400;
+    padding: 8px;
+}
+
+.two-letter-list {
+    font-family: "nyt-imperial";
+    font-size: 1.25rem;
+    font-weight: 400;
+    padding: 8px;
+}
+
+.two-letter-list-row {
+    text-transform: uppercase;
+}
+
+.two-letter-list-item {
+    margin-right: 8px;
+}
+
+.spelling-bee-helper-title {
+    font-weight: 700;
+    padding-bottom: 8px;
 }
