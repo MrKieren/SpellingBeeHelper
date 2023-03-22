@@ -1,7 +1,7 @@
-import React from "react"
 import { useCallback, useEffect, useState } from "react"
 import ReactDOM from "react-dom"
 import SpellingBeeGrid from "./spellingbeegrid"
+import TwoLetterList from "./twoletterlist"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 
@@ -227,52 +227,6 @@ const SpellingBee = () => {
         setRequiredTwoLetterCounts(twoLetterCounts)
     }
 
-    function CalculateTwoLetterCount() {
-        const updatedCounters: JSX.Element[] = []
-
-        var currentFirstLetter = "a"
-        var currentRow = <></>
-
-        requiredTwoLetterCounts.forEach((count, letters) => {
-            if (letters[0] !== currentFirstLetter) {
-                updatedCounters.push(currentRow)
-
-                currentFirstLetter = letters[0]
-                currentRow = <></>
-            }
-
-            const foundCount = foundTwoLetterCounts.get(letters) ?? 0
-
-            currentRow = React.cloneElement(
-                currentRow,
-                {},
-                [
-                    currentRow,
-                    <span className="two-letter-list-item">
-                        {letters.toUpperCase()}-{count - foundCount}
-                    </span>
-                ]
-            )
-        })
-
-        return <>
-            <div className="two-letter-list">
-                <p className="spelling-bee-helper-title">Two letter list</p>
-                <ul>
-                    {updatedCounters.map((count) => (
-                        <>
-                            <li>
-                                <span className="two-letter-list-row">
-                                    {count}
-                                </span>
-                            </li>
-                        </>
-                    ))}
-                </ul>
-            </div>
-        </>
-    }
-
     return <>
         <div className="spelling-bee-helper sb-wordlist-box">
             <SpellingBeeGrid
@@ -280,7 +234,9 @@ const SpellingBee = () => {
                 requiredLetterCounts={requiredLetterCounts}
                 foundLetterCounts={foundLetterCounts}
                 foundWordLengths={foundWordLengths} />
-            <CalculateTwoLetterCount />
+            <TwoLetterList 
+                requiredTwoLetterCounts={requiredTwoLetterCounts} 
+                foundTwoLetterCounts={foundTwoLetterCounts} />
         </div>
     </>
 }
