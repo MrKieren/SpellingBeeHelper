@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 import ReactDOM from "react-dom"
 import SpellingBeeGrid from "./spellingbeegrid"
 import TwoLetterList from "./twoletterlist"
+import { currentDate } from "./utils"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 
@@ -138,15 +139,6 @@ const SpellingBee = () => {
         setFoundLetterCounts(letterCounts)
         setFoundTwoLetterCounts(twoLetterCounts)
         setFoundWordLengths(wordLengthCounts)
-    }
-
-    function currentDate() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, "0");
-        const day = String(today.getDate()).padStart(2, "0");
-
-        return `${year}/${month}/${day}`;
     }
 
     function parseSpellingBeeGrid(interactiveBody: Element) {
