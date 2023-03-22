@@ -9,7 +9,8 @@ module.exports = {
                     main: [env === "development" &&
                         require.resolve("react-dev-utils/webpackHotDevClient"), paths.appIndexJs].filter(Boolean),
                     content: [
-                        "./src/content_scripts/spellingbee.tsx"
+                        "./src/content_scripts/spellingbee.tsx",
+                        "./src/content_scripts/spellingbeegrid.tsx"
                     ]
                 },
                 output: {
