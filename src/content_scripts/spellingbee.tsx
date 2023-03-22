@@ -12,6 +12,8 @@ const SpellingBee = () => {
         useState(new Map<string, Map<number, number>>())
     const [foundLetterCounts, setFoundLetterCounts] =
         useState(new Map<string, Map<number, number>>())
+    const [foundWordLengths, setFoundWordLengths] =
+        useState(new Map<number, number>())
 
     const [requiredTwoLetterCounts, setRequiredTwoLetterCounts] =
         useState(new Map<string, number>())
@@ -95,6 +97,7 @@ const SpellingBee = () => {
 
         const letterCounts = new Map<string, Map<number, number>>()
         const twoLetterCounts = new Map<string, number>()
+        const wordLengthCounts = new Map<number, number>()
 
         for (let index = 0; index < words.length; index++) {
             const child = words[index]
@@ -121,10 +124,19 @@ const SpellingBee = () => {
 
             const twoLetterCount = twoLetterCounts.get(firstTwoLetters) ?? 0
             twoLetterCounts.set(firstTwoLetters, twoLetterCount + 1)
+
+            const wordLength = word.length
+            if (!wordLengthCounts.has(wordLength)) {
+                wordLengthCounts.set(wordLength, 0)
+            }
+
+            const oldWordLength = wordLengthCounts.get(wordLength) ?? 0
+            wordLengthCounts.set(wordLength, oldWordLength + 1)
         }
 
         setFoundLetterCounts(letterCounts)
         setFoundTwoLetterCounts(twoLetterCounts)
+        setFoundWordLengths(wordLengthCounts)
     }
 
     const CurrentDate = () => {
@@ -216,13 +228,37 @@ const SpellingBee = () => {
 
     const CalculateWordCount = () => {
         const updatedCounters = new Map<string, Map<number, number>>()
+        var wordRunningCount = 0
 
         requiredLetterCounts.forEach((counts, letter) => {
             const updatedLetterCounts = new Map<number, number>()
+            var letterRunningCount = 0
+
             counts.forEach((count, wordLength) => {
                 const foundCount =
                     foundLetterCounts.get(letter)?.get(wordLength) ?? 0
-                updatedLetterCounts.set(wordLength, count - foundCount)
+
+                if (wordLength === undefined) {
+                    // Handle the last column being the total count of letters.
+                    if (letter === "Σ") {
+                        updatedLetterCounts.set(
+                            wordLength, count - wordRunningCount
+                        )
+                    } else {
+                        updatedLetterCounts.set(
+                            wordLength, count - letterRunningCount
+                        )
+                    }
+                } else if (letter === "Σ") {
+                    // Handle the last row being the word length count.
+                    const lengthCount = foundWordLengths.get(wordLength) ?? 0
+                    updatedLetterCounts.set(wordLength, count - lengthCount)
+                } else {
+                    // Normal letter word length counter.
+                    letterRunningCount += foundCount
+                    wordRunningCount += foundCount
+                    updatedLetterCounts.set(wordLength, count - foundCount)
+                }
             })
 
             updatedCounters.set(letter, updatedLetterCounts)
