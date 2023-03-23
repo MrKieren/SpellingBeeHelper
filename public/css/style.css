@@ -1,6 +1,6 @@
 .spelling-bee-helper {
     margin-top: 70px;
-    font-family: "nyt-imperial"
+    font-family: "nyt-franklin"
 }
 
 .spelling-bee-helper-error {
@@ -39,14 +39,12 @@ tr:last-child {
 }
 
 .spelling-bee-helper-grid {
-    font-family: "nyt-imperial";
     font-size: 1.25rem;
     font-weight: 400;
     padding: 8px;
 }
 
 .two-letter-list {
-    font-family: "nyt-imperial";
     font-size: 1.25rem;
     font-weight: 400;
     padding: 8px;
