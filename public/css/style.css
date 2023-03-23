@@ -52,6 +52,7 @@ tr:last-child {
 
 .two-letter-list-row {
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .two-letter-list-item {
