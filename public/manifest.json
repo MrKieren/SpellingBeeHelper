@@ -15,7 +15,8 @@
     {
       "run_at": "document_end",
       "matches": [
-        "https://*.nytimes.com/*"
+        "https://www.nytimes.com/puzzles/spelling-bee",
+        "https://nytimes.com/puzzles/spelling-bee"
       ],
       "js": [
         "./static/js/content.js"
