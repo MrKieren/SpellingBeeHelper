@@ -12,7 +12,9 @@ module.exports = {
                         "./src/content_scripts/utils.ts",
 
                         "./src/content_scripts/spellingbee.tsx",
-                        "./src/content_scripts/spellingbeegrid.tsx"
+                        "./src/content_scripts/spellingbeegrid.tsx",
+                        "./src/content_scripts/todayshintsparser.ts",
+                        "./src/content_scripts/foundwordsparser.ts"
                     ]
                 },
                 output: {

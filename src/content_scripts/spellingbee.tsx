@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 import ReactDOM from "react-dom"
+import { updateFoundWords } from "./foundwordsparser"
 import SpellingBeeGrid from "./spellingbeegrid"
 import { fetchData } from "./todayshintsparser"
 import TwoLetterList from "./twoletterlist"
@@ -36,7 +37,10 @@ const SpellingBee = () => {
             const submitButtonTarget = mutation[0].target as Element
             if (submitButtonTarget.classList.contains("push-active") ||
                 submitButtonTarget.classList.contains("action-active")) {
-                updateFoundWords()
+                const foundWordsData = updateFoundWords()
+                setFoundLetterCounts(foundWordsData.letterCounts)
+                setFoundTwoLetterCounts(foundWordsData.twoLetterCounts)
+                setFoundWordLengths(foundWordsData.wordLengthCounts)
             }
         })
 
@@ -55,7 +59,10 @@ const SpellingBee = () => {
             setRequiredLetterCounts(todaysHintsData.letterCounts)
             setRequiredTwoLetterCounts(todaysHintsData.twoLetterCounts)
 
-            updateFoundWords()
+            const foundWordsData = updateFoundWords()
+            setFoundLetterCounts(foundWordsData.letterCounts)
+            setFoundTwoLetterCounts(foundWordsData.twoLetterCounts)
+            setFoundWordLengths(foundWordsData.wordLengthCounts)
         } catch (error: any) {
             setError((error as Error).message)
         }
@@ -65,63 +72,6 @@ const SpellingBee = () => {
         update()
         WatchEnterButton()
     }, [WatchEnterButton, update])
-
-    function updateFoundWords() {
-        const wordList = document.getElementsByClassName("sb-has-words")
-        if (wordList == null) {
-            console.log("Failed to find word list.")
-            return
-        }
-
-        const words = wordList[0].getElementsByClassName("sb-anagram")
-        if (words == null) {
-            console.log("Failed to find words in word list.")
-            return
-        }
-
-        const letterCounts = new Map<string, Map<number, number>>()
-        const twoLetterCounts = new Map<string, number>()
-        const wordLengthCounts = new Map<number, number>()
-
-        for (let index = 0; index < words.length; index++) {
-            const child = words[index]
-
-            const word = child.innerHTML
-            const firstLetter = word[0]
-
-            if (!letterCounts.has(firstLetter)) {
-                letterCounts.set(firstLetter, new Map<number, number>())
-            }
-
-            if (!letterCounts.get(firstLetter)?.get(word.length)) {
-                letterCounts.get(firstLetter)?.set(word.length, 0)
-            }
-
-            const letterCount =
-                letterCounts.get(firstLetter)?.get(word.length) ?? 0
-            letterCounts.get(firstLetter)?.set(word.length, letterCount + 1)
-
-            const firstTwoLetters = word[0] + word[1]
-            if (!twoLetterCounts.has(firstTwoLetters)) {
-                twoLetterCounts.set(firstTwoLetters, 0)
-            }
-
-            const twoLetterCount = twoLetterCounts.get(firstTwoLetters) ?? 0
-            twoLetterCounts.set(firstTwoLetters, twoLetterCount + 1)
-
-            const wordLength = word.length
-            if (!wordLengthCounts.has(wordLength)) {
-                wordLengthCounts.set(wordLength, 0)
-            }
-
-            const oldWordLength = wordLengthCounts.get(wordLength) ?? 0
-            wordLengthCounts.set(wordLength, oldWordLength + 1)
-        }
-
-        setFoundLetterCounts(letterCounts)
-        setFoundTwoLetterCounts(twoLetterCounts)
-        setFoundWordLengths(wordLengthCounts)
-    }
 
     return <>
         <div className="spelling-bee-helper sb-wordlist-box">
