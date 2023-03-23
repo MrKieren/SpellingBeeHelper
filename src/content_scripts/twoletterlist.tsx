@@ -35,6 +35,7 @@ const TwoLetterList = ({
             ]
         )
     })
+    updatedCounters.push(currentRow)
 
     return <>
         <div className="two-letter-list">
