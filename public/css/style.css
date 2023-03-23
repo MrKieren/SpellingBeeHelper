@@ -3,6 +3,11 @@
     font-family: "nyt-imperial"
 }
 
+.spelling-bee-helper-error {
+    color: red;
+    padding: 8px;
+}
+
 .table {
     text-align: center;
     text-transform: uppercase;

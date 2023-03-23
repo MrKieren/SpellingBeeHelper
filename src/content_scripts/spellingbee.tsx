@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react"
 import ReactDOM from "react-dom"
 import SpellingBeeGrid from "./spellingbeegrid"
+import { fetchData } from "./todayshintsparser"
 import TwoLetterList from "./twoletterlist"
-import { currentDate } from "./utils"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 
@@ -21,6 +21,8 @@ const SpellingBee = () => {
         useState(new Map<string, number>())
     const [foundTwoLetterCounts, setFoundTwoLetterCounts] =
         useState(new Map<string, number>())
+
+    const [error, setError] = useState("")
 
     const WatchEnterButton = useCallback(() => {
         const submitButton =
@@ -46,38 +48,18 @@ const SpellingBee = () => {
         })
     }, [])
 
-    const fetchData = useCallback(async function () {
+    const update = useCallback(async () => {
         try {
-            const response = await fetch(
-                `https://www.nytimes.com/${currentDate()}/crosswords/spelling-bee-forum.html`
-            )
-            if (!response.ok) {
-                throw new Error(`HTTPS error status: ${response.status}`)
-            }
+            const todaysHintsData = await fetchData()
+            setRequiredWordLengths(todaysHintsData.wordLengths)
+            setRequiredLetterCounts(todaysHintsData.letterCounts)
+            setRequiredTwoLetterCounts(todaysHintsData.twoLetterCounts)
 
-            const html = await response.text()
-
-            const parser = new DOMParser()
-            const doc = parser.parseFromString(html, "text/html")
-
-            const interactiveBody =
-                doc.getElementsByClassName("interactive-body")
-            if (interactiveBody == null || interactiveBody.length !== 1) {
-                console.log("Failed to find interactive body.")
-                return
-            }
-
-            parseSpellingBeeGrid(interactiveBody[0])
-            parseTwoLetterList(interactiveBody[0])
-        } catch (error) {
-            console.error(error);
+            updateFoundWords()
+        } catch (error: any) {
+            setError((error as Error).message)
         }
     }, [])
-
-    const update = useCallback(async () => {
-        await fetchData()
-        updateFoundWords()
-    }, [fetchData])
 
     useEffect(() => {
         update()
@@ -141,94 +123,22 @@ const SpellingBee = () => {
         setFoundWordLengths(wordLengthCounts)
     }
 
-    function parseSpellingBeeGrid(interactiveBody: Element) {
-        const grid = interactiveBody.getElementsByTagName("table")
-        if (grid == null || grid.length !== 1) {
-            console.log("Failed to find Spelling Bee Grid.")
-            return [new Set<number>(), new Map<string, Array<number>>()]
-        }
-
-        const rows = grid[0].getElementsByTagName("tr")
-
-        const wordLengths = new Array<number>()
-
-        const wordCountCells = rows[0].getElementsByTagName("td")
-        for (let i = 0; i < wordCountCells.length; i++) {
-            const data = wordCountCells[i].textContent?.trim() ?? ""
-            if (data === "-") {
-                wordLengths.push(0)
-            } else if (data.length > 0 && !isNaN(Number(data))) {
-                wordLengths.push(Number(data))
-            }
-        }
-
-        const letterCounts = new Map<string, Map<number, number>>()
-
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i].getElementsByTagName("td")
-            const rowLetter = row[0].textContent?.trim().replace(":", "") ?? ""
-            if (rowLetter?.length === 0) {
-                console.log("Failed to get row letter.")
-                continue
-            }
-
-            letterCounts.set(rowLetter, new Map<number, number>())
-
-            for (let j = 1; j < row.length; j++) {
-                const data = row[j].textContent?.trim() ?? ""
-                if (data === "-") {
-                    letterCounts.get(rowLetter)!.set(wordLengths[j - 1], 0)
-                } else if (data.length > 0 && !isNaN(Number(data))) {
-                    letterCounts
-                        .get(rowLetter)!
-                        .set(wordLengths[j - 1], Number(data))
-                }
-            }
-        }
-
-        setRequiredWordLengths(wordLengths)
-        setRequiredLetterCounts(letterCounts)
-    }
-
-    function parseTwoLetterList(interactiveBody: Element) {
-        const pElements = interactiveBody.getElementsByTagName("p")
-        if (pElements === null || pElements.length === 0) {
-            console.log("Failed to find two letter list.")
-            return new Map<string, number>()
-        }
-
-        const twoLetterList = pElements[pElements.length - 1]
-            .getElementsByTagName("span")
-
-        const twoLetterCounts = new Map<string, number>()
-        for (let i = 0; i < twoLetterList.length; i++) {
-            const data = twoLetterList[i].textContent?.trim() ?? ""
-            const splitData = data.split(" ")
-
-            for (let j = 0; j < splitData.length; j++) {
-                const itemCount = splitData[j].split("-")
-                if (itemCount.length !== 2) {
-                    console.log("Invalid two letter count: " + splitData[j])
-                    continue
-                }
-
-                twoLetterCounts.set(itemCount[0], Number(itemCount[1]))
-            }
-        }
-
-        setRequiredTwoLetterCounts(twoLetterCounts)
-    }
-
     return <>
         <div className="spelling-bee-helper sb-wordlist-box">
-            <SpellingBeeGrid
-                requiredWordLengths={requiredWordLengths}
-                requiredLetterCounts={requiredLetterCounts}
-                foundLetterCounts={foundLetterCounts}
-                foundWordLengths={foundWordLengths} />
-            <TwoLetterList 
-                requiredTwoLetterCounts={requiredTwoLetterCounts} 
-                foundTwoLetterCounts={foundTwoLetterCounts} />
+            {error !== "" ?
+                <p className="spelling-bee-helper-error">{error}</p>
+                :
+                <>
+                    <SpellingBeeGrid
+                        requiredWordLengths={requiredWordLengths}
+                        requiredLetterCounts={requiredLetterCounts}
+                        foundLetterCounts={foundLetterCounts}
+                        foundWordLengths={foundWordLengths} />
+                    <TwoLetterList
+                        requiredTwoLetterCounts={requiredTwoLetterCounts}
+                        foundTwoLetterCounts={foundTwoLetterCounts} />
+                </>
+            }
         </div>
     </>
 }
