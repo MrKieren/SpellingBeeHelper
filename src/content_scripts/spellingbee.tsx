@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import ReactDOM from "react-dom"
 import { updateFoundWords } from "./foundwordsparser"
+import WordTotals from "./wordtotals"
 import SpellingBeeGrid from "./spellingbeegrid"
 import { fetchData } from "./todayshintsparser"
 import TwoLetterList from "./twoletterlist"
@@ -8,6 +9,13 @@ import TwoLetterList from "./twoletterlist"
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 
 const SpellingBee = () => {
+    const [requiredWordTotals, setRequiredWordTotals] = useState({
+        words: 0,
+        pangrams: 0,
+        perfectPangrams: 0,
+        points: 0
+    })
+
     const [requiredWordLengths, setRequiredWordLengths] =
         useState(new Array<number>())
 
@@ -58,6 +66,7 @@ const SpellingBee = () => {
             setRequiredWordLengths(todaysHintsData.wordLengths)
             setRequiredLetterCounts(todaysHintsData.letterCounts)
             setRequiredTwoLetterCounts(todaysHintsData.twoLetterCounts)
+            setRequiredWordTotals(todaysHintsData.requiredWordTotals)
 
             const foundWordsData = updateFoundWords()
             setFoundLetterCounts(foundWordsData.letterCounts)
@@ -79,6 +88,8 @@ const SpellingBee = () => {
                 <p className="spelling-bee-helper-error">{error}</p>
                 :
                 <>
+                    <WordTotals
+                        requiredWordTotals={requiredWordTotals} />
                     <SpellingBeeGrid
                         requiredWordLengths={requiredWordLengths}
                         requiredLetterCounts={requiredLetterCounts}

@@ -4,11 +4,19 @@ type TodaysHintsData = {
     wordLengths: Array<number>
     letterCounts: Map<string, Map<number, number>>
     twoLetterCounts: Map<string, number>
+    requiredWordTotals: WordTotals
 }
 
 type SpellingBeeGridData = {
     wordLengths: Array<number>
     letterCounts: Map<string, Map<number, number>>
+}
+
+type WordTotals = {
+    words: number
+    pangrams: number
+    perfectPangrams: number
+    points: number
 }
 
 export async function fetchData(): Promise<TodaysHintsData> {
@@ -34,10 +42,13 @@ export async function fetchData(): Promise<TodaysHintsData> {
 
     const spellingBeeGridData = parseSpellingBeeGrid(interactiveBody[0])
     const twoLetterCounts = parseTwoLetterList(interactiveBody[0])
+    const requiredWordTotals = parseStats(interactiveBody[0])
+
     return {
         wordLengths: spellingBeeGridData.wordLengths,
         letterCounts: spellingBeeGridData.letterCounts,
-        twoLetterCounts: twoLetterCounts
+        twoLetterCounts: twoLetterCounts,
+        requiredWordTotals: requiredWordTotals
     }
 }
 
@@ -90,13 +101,18 @@ function parseSpellingBeeGrid(
     return { wordLengths, letterCounts }
 }
 
-function parseTwoLetterList(interactiveBody: Element): Map<string, number> {
+function getPElements(
+    interactiveBody: Element
+): HTMLCollectionOf<HTMLParagraphElement> {
     const pElements = interactiveBody.getElementsByTagName("p")
     if (pElements === null || pElements.length === 0) {
-        console.log("Failed to find two letter list.")
-        return new Map<string, number>()
+        throw new Error("Failed to find any hints in Today's Hints.")
     }
+    return pElements
+}
 
+function parseTwoLetterList(interactiveBody: Element): Map<string, number> {
+    const pElements = getPElements(interactiveBody)
     const twoLetterList = pElements[pElements.length - 1]
         .getElementsByTagName("span")
 
@@ -117,4 +133,49 @@ function parseTwoLetterList(interactiveBody: Element): Map<string, number> {
     }
 
     return twoLetterCounts
+}
+
+function parseStats(interactiveBody: Element): WordTotals {
+    const pElements = getPElements(interactiveBody)
+    const stats = Array.from(pElements).find(element => {
+        return element.innerHTML.includes("PANGRAMS")
+    })
+    if (stats === null) {
+        throw new Error("Failed to find game stats.")
+    }
+
+    const content = stats?.innerHTML
+    const contentParts = content?.split(",")
+
+    var words = 0
+    var pangrams = 0
+    var perfectPangrams = 0
+    var points = 0
+    contentParts?.forEach(part => {
+        if (part.includes("WORDS")) {
+            words = Number(part.replace("WORDS:", "").trim())
+        }
+
+        if (part.includes("PANGRAMS")) {
+            const pangramParts = part.split("(")
+            pangrams = Number(pangramParts[0].replace("PANGRAMS:", "").trim())
+
+            if (pangramParts.length === 2) {
+                perfectPangrams = Number(
+                    pangramParts[1].replace("Perfect)", "").trim()
+                )
+            }
+        }
+
+        if (part.includes("POINTS")) {
+            points = Number(part.replace("POINTS:", "").trim())
+        }
+    })
+
+    return {
+        words: words,
+        pangrams: pangrams,
+        perfectPangrams: perfectPangrams,
+        points: points
+    }
 }

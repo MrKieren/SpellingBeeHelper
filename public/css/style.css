@@ -62,4 +62,10 @@ tr:last-child {
 .spelling-bee-helper-title {
     font-weight: 700;
     padding-bottom: 8px;
+    font-size: 1.25rem;
+}
+
+.word-totals {
+    padding: 8px;
+    font-size: 1rem;
 }
