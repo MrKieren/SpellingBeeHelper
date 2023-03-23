@@ -24,5 +24,10 @@
         "./css/style.css"
       ]
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "q5pt4res@duck.com"
+    }
+  }
 }
