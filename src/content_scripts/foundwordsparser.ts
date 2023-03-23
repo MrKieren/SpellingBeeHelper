@@ -5,7 +5,7 @@ type FoundWordsData = {
 }
 
 export function updateFoundWords(): FoundWordsData {
-    const wordList = document.getElementsByClassName("sb-has-words")
+    const wordList = document.getElementsByClassName("sb-wordlist-drawer")
     if (wordList == null || wordList.length !== 1) {
         throw new Error("Failed to find word list.")
     }
