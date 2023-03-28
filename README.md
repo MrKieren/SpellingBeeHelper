@@ -1,46 +1,52 @@
-# Getting Started with Create React App
+# Spelling Bee Helper
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Update the Spelling Bee game on the New York Times website to add Today's Hints to the game screen.
 
-## Available Scripts
+Stop using multiple windows to keep track of the words you still have left to find.
 
-In the project directory, you can run:
+The word grid and two letter list are kept up to date based on what you've already found. No more manually counting how many 5 letter words you've found!
 
-### `npm start`
+You can start using the Spelling Bee helper by installing it for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/spelling-bee-helper/) or [Chrome](https://chrome.google.com/webstore/detail/spelling-bee-helper/ilbdolhmhkjhecehbdcneffapakklbgh).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Building
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+If you want to build your own version of the Spelling Bee Helper follow these instructions.
+
+You’ll need to have Node installed to build. You can download the installer from the [Node website](https://nodejs.org/en).
+
+In the project directory, use the following command to build the project:
+
+`npm run build`
+
+This builds the app to the `build` folder. Everything you need for the plugin is included.
+
+## Installing
+
+To install your custom build of the Spelling Bee helper, follow the instructions for your browser.
+
+### Firefox
+
+1. Open the `Tools` menu and select `Add-ons and Themes`
+1. Select the cog icon and select `Debug Add-ons`
+1. Click the `Load Temporary Add-on...` button
+1. Navigate to the build folder for the plug-in and select any file (it doesn't matter which one) and click `Open`
+
+### Chrome
+
+1. Open the `Window` menu and select `Extensions`
+1. In the top right toggle `Developer mode` on
+1. Click the `Load unpacked` button
+1. Navigate to the build folder and click `Select`
+
+## Running 
+
+Open the [Spelling Bee game](https://www.nytimes.com/puzzles/spelling-bee)
+
+If everything is built correctly the Spelling Bee Helper should appear to the left of the Spelling Bee letters.
+
+## Testing
 
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
