@@ -33,7 +33,7 @@ const SpellingBee = () => {
 
     const [error, setError] = useState("")
 
-    const WatchEnterButton = useCallback(() => {
+    const watchEnterButton = useCallback(() => {
         const submitButton =
             document.getElementsByClassName("hive-action__submit")
         if (submitButton == null || submitButton.length !== 1) {
@@ -60,6 +60,34 @@ const SpellingBee = () => {
         })
     }, [])
 
+    const watchGameScreenAppear = useCallback(() => {
+        const gameScreen =
+            document.getElementsByClassName("pz-game-screen")
+        if (gameScreen == null || gameScreen.length !== 1) {
+            console.log("Failed to find game screen.")
+            return
+        }
+
+        const observer = new MutationObserver((mutation) => {
+            observer.disconnect()
+
+            const gameScreenTarget = mutation[0].target as Element
+            if (gameScreenTarget.classList.contains("on-stage")) {
+                const foundWordsData = updateFoundWords()
+                setFoundLetterCounts(foundWordsData.letterCounts)
+                setFoundTwoLetterCounts(foundWordsData.twoLetterCounts)
+                setFoundWordLengths(foundWordsData.wordLengthCounts)
+            }
+        })
+
+        observer.observe(gameScreen[0], {
+            attributes: true,
+            attributeFilter: ["class"],
+            childList: false,
+            characterData: false
+        })
+    }, [])
+
     const update = useCallback(async () => {
         try {
             const todaysHintsData = await fetchData()
@@ -78,9 +106,10 @@ const SpellingBee = () => {
     }, [])
 
     useEffect(() => {
+        watchGameScreenAppear()
+        watchEnterButton()
         update()
-        WatchEnterButton()
-    }, [WatchEnterButton, update])
+    }, [watchGameScreenAppear, watchEnterButton, update])
 
     return <>
         <div className="spelling-bee-helper sb-wordlist-box">
