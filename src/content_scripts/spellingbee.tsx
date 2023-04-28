@@ -5,6 +5,7 @@ import WordTotals from "./wordtotals"
 import SpellingBeeGrid from "./spellingbeegrid"
 import { fetchData } from "./todayshintsparser"
 import TwoLetterList from "./twoletterlist"
+import BeePhoto from "./beephoto"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 
@@ -30,6 +31,12 @@ const SpellingBee = () => {
         useState(new Map<string, number>())
     const [foundTwoLetterCounts, setFoundTwoLetterCounts] =
         useState(new Map<string, number>())
+
+    const [beePhoto, setBeePhoto] = useState({
+        src: "",
+        srcset: "",
+        credit: ""
+    })
 
     const [error, setError] = useState("")
 
@@ -95,6 +102,7 @@ const SpellingBee = () => {
             setRequiredLetterCounts(todaysHintsData.letterCounts)
             setRequiredTwoLetterCounts(todaysHintsData.twoLetterCounts)
             setRequiredWordTotals(todaysHintsData.requiredWordTotals)
+            setBeePhoto(todaysHintsData.beePhoto)
 
             const foundWordsData = updateFoundWords()
             setFoundLetterCounts(foundWordsData.letterCounts)
@@ -127,6 +135,10 @@ const SpellingBee = () => {
                     <TwoLetterList
                         requiredTwoLetterCounts={requiredTwoLetterCounts}
                         foundTwoLetterCounts={foundTwoLetterCounts} />
+                    <BeePhoto
+                        src={beePhoto.src}
+                        srcset={beePhoto.srcset}
+                        credit={beePhoto.credit} />
                 </>
             }
         </div>

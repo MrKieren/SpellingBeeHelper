@@ -5,6 +5,7 @@ type TodaysHintsData = {
     letterCounts: Map<string, Map<number, number>>
     twoLetterCounts: Map<string, number>
     requiredWordTotals: WordTotals
+    beePhoto: BeePhoto
 }
 
 type SpellingBeeGridData = {
@@ -17,6 +18,12 @@ type WordTotals = {
     pangrams: number
     perfectPangrams: number
     points: number
+}
+
+type BeePhoto = {
+    src: string,
+    srcset: string,
+    credit: string
 }
 
 export async function fetchData(): Promise<TodaysHintsData> {
@@ -43,12 +50,14 @@ export async function fetchData(): Promise<TodaysHintsData> {
     const spellingBeeGridData = parseSpellingBeeGrid(interactiveBody[0])
     const twoLetterCounts = parseTwoLetterList(interactiveBody[0])
     const requiredWordTotals = parseStats(interactiveBody[0])
+    const beePhoto = parseBeePhoto(doc)
 
     return {
         wordLengths: spellingBeeGridData.wordLengths,
         letterCounts: spellingBeeGridData.letterCounts,
         twoLetterCounts: twoLetterCounts,
-        requiredWordTotals: requiredWordTotals
+        requiredWordTotals: requiredWordTotals,
+        beePhoto: beePhoto
     }
 }
 
@@ -177,5 +186,40 @@ function parseStats(interactiveBody: Element): WordTotals {
         pangrams: pangrams,
         perfectPangrams: perfectPangrams,
         points: points
+    }
+}
+
+function parseBeePhoto(doc: Document): BeePhoto {
+    const pictureElement = doc.getElementsByTagName("picture")
+    if (pictureElement == null || pictureElement.length !== 1) {
+        throw new Error("Failed to find bee picture element.")
+    }
+
+    const beeImage = pictureElement[0].getElementsByTagName("img")
+    if (beeImage == null || beeImage.length !== 1) {
+        throw new Error("Failed to find bee image.")
+    }
+
+    const figCaptionElement = doc.getElementsByTagName("figCaption")
+    if (figCaptionElement == null || figCaptionElement.length !== 1) {
+        throw new Error("Failed to find bee picture credit element.")
+    }
+
+    var credit = ""
+    const beeImageCredit = figCaptionElement[0].getElementsByTagName("span")
+    for (let i = 1; i < beeImageCredit.length; i++) {
+        const content = beeImageCredit[i].innerText ?? ""
+        if (!content.includes("Courtesy of")) {
+            continue
+        }
+
+        credit = content
+        break
+    }
+
+    return {
+        src: beeImage[0].getAttribute("src") ?? "",
+        srcset: beeImage[0].getAttribute("srcset") ?? "",
+        credit: credit
     }
 }

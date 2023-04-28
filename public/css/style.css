@@ -1,6 +1,7 @@
 .spelling-bee-helper {
     margin-top: 70px;
-    font-family: "nyt-franklin"
+    font-family: "nyt-franklin";
+    width: min-content;
 }
 
 .spelling-bee-helper-error {
@@ -68,4 +69,19 @@ tr:last-child {
 .word-totals {
     padding: 8px;
     font-size: 1rem;
+}
+
+.spelling-bee-helper-bee-photo {
+    object-fit: contain;
+    max-width: 100%;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.spelling-bee-helper-bee-photo-credit {
+    font-size: 0.9rem;
+    color: grey;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
 }
