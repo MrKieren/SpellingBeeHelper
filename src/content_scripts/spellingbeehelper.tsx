@@ -1,15 +1,19 @@
 import { useCallback, useEffect, useState } from "react"
-import ReactDOM from "react-dom"
 import { updateFoundWords } from "./foundwordsparser"
 import WordTotals from "./wordtotals"
 import SpellingBeeGrid from "./spellingbeegrid"
 import { fetchData } from "./todayshintsparser"
 import TwoLetterList from "./twoletterlist"
 import BeePhoto from "./beephoto"
+import { UpdateErrorFunction } from "./index"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 
-const SpellingBee = () => {
+type Props = {
+    updateError: UpdateErrorFunction
+}
+
+const SpellingBee = ({ updateError }: Props) => {
     const [requiredWordTotals, setRequiredWordTotals] = useState({
         words: 0,
         pangrams: 0,
@@ -32,13 +36,13 @@ const SpellingBee = () => {
     const [foundTwoLetterCounts, setFoundTwoLetterCounts] =
         useState(new Map<string, number>())
 
+    const [error, setError] = useState("")
+
     const [beePhoto, setBeePhoto] = useState({
         src: "",
         srcset: "",
         credit: ""
     })
-
-    const [error, setError] = useState("")
 
     const watchEnterButton = useCallback(() => {
         const submitButton =
@@ -119,52 +123,26 @@ const SpellingBee = () => {
         update()
     }, [watchGameScreenAppear, watchEnterButton, update])
 
+    useEffect(() => {
+        updateError(error)
+    }, [error, updateError])
+
     return <>
-        <div className="spelling-bee-helper sb-wordlist-box">
-            {error !== "" ?
-                <p className="spelling-bee-helper-error">{error}</p>
-                :
-                <>
-                    <WordTotals
-                        requiredWordTotals={requiredWordTotals} />
-                    <SpellingBeeGrid
-                        requiredWordLengths={requiredWordLengths}
-                        requiredLetterCounts={requiredLetterCounts}
-                        foundLetterCounts={foundLetterCounts}
-                        foundWordLengths={foundWordLengths} />
-                    <TwoLetterList
-                        requiredTwoLetterCounts={requiredTwoLetterCounts}
-                        foundTwoLetterCounts={foundTwoLetterCounts} />
-                    <BeePhoto
-                        src={beePhoto.src}
-                        srcset={beePhoto.srcset}
-                        credit={beePhoto.credit} />
-                </>
-            }
-        </div>
+        <WordTotals
+            requiredWordTotals={requiredWordTotals} />
+        <SpellingBeeGrid
+            requiredWordLengths={requiredWordLengths}
+            requiredLetterCounts={requiredLetterCounts}
+            foundLetterCounts={foundLetterCounts}
+            foundWordLengths={foundWordLengths} />
+        <TwoLetterList
+            requiredTwoLetterCounts={requiredTwoLetterCounts}
+            foundTwoLetterCounts={foundTwoLetterCounts} />
+        <BeePhoto
+            src={beePhoto.src}
+            srcset={beePhoto.srcset}
+            credit={beePhoto.credit} />
     </>
 }
-
-function render() {
-    const contentBox = document.getElementsByClassName("sb-content-box")
-    if (contentBox == null || contentBox.length !== 1) {
-        console.log("Failed to find content box.")
-        return
-    }
-
-    const wordListWindow = document.createElement("div")
-    wordListWindow.setAttribute("class", SPELLING_BEE_CONTENT_AREA)
-    wordListWindow.setAttribute("id", SPELLING_BEE_CONTENT_AREA)
-
-    contentBox[0].appendChild(wordListWindow)
-
-    ReactDOM.render(
-        <SpellingBee />,
-        document.getElementById(SPELLING_BEE_CONTENT_AREA)
-    )
-}
-
-console.log("Loading Spelling Bee Helper.")
-render()
 
 export default SpellingBee

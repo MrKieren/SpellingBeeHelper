@@ -11,12 +11,18 @@ module.exports = {
                     content: [
                         "./src/content_scripts/utils.ts",
 
-                        "./src/content_scripts/spellingbee.tsx",
-                        "./src/content_scripts/spellingbeegrid.tsx",
                         "./src/content_scripts/todayshintsparser.ts",
+
+                        "./src/content_scripts/index.tsx",
+
+                        "./src/content_scripts/spellingbeehelper.tsx",
                         "./src/content_scripts/foundwordsparser.ts",
+                        "./src/content_scripts/spellingbeegrid.tsx",
+                        "./src/content_scripts/twoletterlist.tsx",
                         "./src/content_scripts/wordtotals.tsx",
-                        "./src/content_scripts/beephoto.tsx"
+                        "./src/content_scripts/beephoto.tsx",
+
+                        "./src/content_scripts/errorview.tsx"
                     ]
                 },
                 output: {
