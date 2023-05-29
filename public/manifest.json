@@ -22,9 +22,20 @@
         "./static/js/content.js"
       ],
       "css": [
-        "./css/style.css"
+        "./css/style.css",
+        "./css/toggle.css"
       ]
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [ "img/settings_cog.svg", "img/back_arrow.svg" ],
+      "matches": [ 
+        "https://www.nytimes.com/puzzles/spelling-bee",
+        "https://nytimes.com/puzzles/spelling-bee"
+       ]
+    }
+    
   ],
   "browser_specific_settings": {
     "gecko": {

@@ -11,6 +11,8 @@ module.exports = {
                     content: [
                         "./src/content_scripts/utils.ts",
 
+                        "./src/content_scripts/controls/ToggleButton.tsx",
+
                         "./src/content_scripts/todayshintsparser.ts",
 
                         "./src/content_scripts/index.tsx",
@@ -22,7 +24,9 @@ module.exports = {
                         "./src/content_scripts/wordtotals.tsx",
                         "./src/content_scripts/beephoto.tsx",
 
-                        "./src/content_scripts/errorview.tsx"
+                        "./src/content_scripts/ErrorView.tsx",
+
+                        "./src/content_scripts/Settings.tsx"
                     ]
                 },
                 output: {

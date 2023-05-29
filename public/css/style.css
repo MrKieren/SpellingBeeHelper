@@ -1,7 +1,68 @@
 .spelling-bee-helper {
+    display: flex;
+    flex-direction: column;
+
     margin-top: 70px;
+    padding-top: 8px;
     font-family: "nyt-franklin";
     width: min-content;
+}
+
+.spelling-bee-helper>div:not(:last-child) {
+    margin-bottom: 8px;
+}
+
+.spelling-bee-helper-title-container {
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.spelling-bee-helper-main-title {
+    margin-right: 10px;
+    font-size: 1.5rem;
+}
+
+.spelling-bee-helper-settings-cog {
+    margin-left: auto;
+
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease;
+}
+
+.spelling-bee-helper-settings-cog.flipped {
+    transform: rotateY(360deg);
+}
+
+.spelling-bee-helper-settings-cog.flipped :first-child {
+    display: none;
+}
+
+.spelling-bee-helper-settings-cog.flipped :last-child {
+    display: block;
+}
+
+.spelling-bee-helper-settings-cog>.back-arrow {
+    display: none;
+}
+
+.spelling-bee-helper-main-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    animation: fadeIn 500ms;
+}
+
+.spelling-bee-helper-settings-container {
+    padding-left: 8px;
+    padding-right: 8px;
+
+    animation: fadeIn 500ms;
 }
 
 .spelling-bee-helper-error {
@@ -13,7 +74,6 @@
     text-align: center;
     text-transform: uppercase;
     width: auto;
-    margin-bottom: 1rem;
     font-size: 1.125rem;
     line-height: 1.5625rem;
 }
@@ -42,13 +102,15 @@ tr:last-child {
 .spelling-bee-helper-grid {
     font-size: 1.25rem;
     font-weight: 400;
-    padding: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .two-letter-list {
     font-size: 1.25rem;
     font-weight: 400;
-    padding: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .two-letter-list-row {
@@ -67,7 +129,8 @@ tr:last-child {
 }
 
 .word-totals {
-    padding: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
     font-size: 1rem;
 }
 

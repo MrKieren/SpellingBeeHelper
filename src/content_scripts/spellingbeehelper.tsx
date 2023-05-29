@@ -127,7 +127,7 @@ const SpellingBee = ({ updateError }: Props) => {
         updateError(error)
     }, [error, updateError])
 
-    return <>
+    return <div className="spelling-bee-helper-main-container">
         <WordTotals
             requiredWordTotals={requiredWordTotals} />
         <SpellingBeeGrid
@@ -142,7 +142,7 @@ const SpellingBee = ({ updateError }: Props) => {
             src={beePhoto.src}
             srcset={beePhoto.srcset}
             credit={beePhoto.credit} />
-    </>
+    </div>
 }
 
 export default SpellingBee

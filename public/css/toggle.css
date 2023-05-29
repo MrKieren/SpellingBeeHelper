@@ -1,0 +1,71 @@
+.spelling-bee-helper-toggle-button {
+    display: flex;
+    align-items: center;
+    padding-bottom: 8px;
+}
+
+.spelling-bee-helper-toggle-button-label {
+    margin-right: 10px;
+}
+
+.spelling-bee-helper-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+
+    order: 1;
+    margin-left: auto;
+}
+
+.spelling-bee-helper-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.spelling-bee-helper-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #E6E6E6;
+    -webkit-transition: .2s;
+    transition: .2s;
+}
+
+.spelling-bee-helper-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .2s;
+    transition: .2s;
+}
+
+input:checked+.spelling-bee-helper-slider {
+    background-color: #F7DA21;
+}
+
+input:focus+.spelling-bee-helper-slider {
+    box-shadow: 0 0 1px #F7DA21;
+}
+
+input:checked+.spelling-bee-helper-slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+.spelling-bee-helper-round {
+    border-radius: 34px;
+}
+
+.spelling-bee-helper-round:before {
+    border-radius: 50%;
+}
