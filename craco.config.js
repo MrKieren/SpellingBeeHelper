@@ -9,20 +9,20 @@ module.exports = {
                     main: [env === "development" &&
                         require.resolve("react-dev-utils/webpackHotDevClient"), paths.appIndexJs].filter(Boolean),
                     content: [
-                        "./src/content_scripts/utils.ts",
+                        "./src/content_scripts/Utils.ts",
 
                         "./src/content_scripts/controls/ToggleButton.tsx",
 
-                        "./src/content_scripts/todayshintsparser.ts",
+                        "./src/content_scripts/TodaysHintsParser.ts",
 
-                        "./src/content_scripts/index.tsx",
+                        "./src/content_scripts/Index.tsx",
 
-                        "./src/content_scripts/spellingbeehelper.tsx",
-                        "./src/content_scripts/foundwordsparser.ts",
-                        "./src/content_scripts/spellingbeegrid.tsx",
-                        "./src/content_scripts/twoletterlist.tsx",
-                        "./src/content_scripts/wordtotals.tsx",
-                        "./src/content_scripts/beephoto.tsx",
+                        "./src/content_scripts/SpellingBeeHelper.tsx",
+                        "./src/content_scripts/FoundWordsParser.ts",
+                        "./src/content_scripts/SpellingBeeGrid.tsx",
+                        "./src/content_scripts/TwoLetterList.tsx",
+                        "./src/content_scripts/WordTotals.tsx",
+                        "./src/content_scripts/BeePhoto.tsx",
 
                         "./src/content_scripts/ErrorView.tsx",
 

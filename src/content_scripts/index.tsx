@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import ReactDOM from "react-dom"
-import SpellingBee from "./spellingbeehelper"
+import SpellingBee from "./SpellingBeeHelper"
 import ErrorView from "./ErrorView"
 import Settings from "./Settings"
 

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react"
-import { updateFoundWords } from "./foundwordsparser"
-import WordTotals from "./wordtotals"
-import SpellingBeeGrid from "./spellingbeegrid"
-import { fetchData } from "./todayshintsparser"
-import TwoLetterList from "./twoletterlist"
-import BeePhoto from "./beephoto"
-import { UpdateErrorFunction } from "./index"
+import { updateFoundWords } from "./FoundWordsParser"
+import WordTotals from "./WordTotals"
+import SpellingBeeGrid from "./SpellingBeeGrid"
+import { fetchData } from "./TodaysHintsParser"
+import TwoLetterList from "./TwoLetterList"
+import BeePhoto from "./BeePhoto"
+import { UpdateErrorFunction } from "./Index"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 

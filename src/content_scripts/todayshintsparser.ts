@@ -1,4 +1,4 @@
-import { currentDate } from "./utils"
+import { currentDate } from "./Utils"
 
 type TodaysHintsData = {
     wordLengths: Array<number>
