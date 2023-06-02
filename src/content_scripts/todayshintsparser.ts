@@ -1,5 +1,3 @@
-import { currentDate } from "./Utils"
-
 type TodaysHintsData = {
     wordLengths: Array<number>
     letterCounts: Map<string, Map<number, number>>
@@ -28,7 +26,7 @@ type BeePhoto = {
 
 export async function fetchData(): Promise<TodaysHintsData> {
     const response = await fetch(
-        `https://www.nytimes.com/${currentDate()}/crosswords/spelling-bee-forum.html`
+        `https://www.nytimes.com/${getGameDate()}/crosswords/spelling-bee-forum.html`
     )
     if (!response.ok) {
         throw new Error(
@@ -59,6 +57,24 @@ export async function fetchData(): Promise<TodaysHintsData> {
         requiredWordTotals: requiredWordTotals,
         beePhoto: beePhoto
     }
+}
+
+function getGameDate() {
+    const gameDate = document.getElementsByClassName("pz-game-date")
+    if (gameDate == null || gameDate.length !== 1) {
+        throw new Error("Failed to find game date.")
+    }
+
+    const gameDateString = gameDate[0].textContent
+    if (gameDateString == null || gameDateString.length === 0) {
+        throw new Error("No game date data found.")
+    }
+
+    const date = new Date(gameDateString)
+    const year = date.getFullYear()
+    const month = (date.getMonth() + 1).toString().padStart(2, "0")
+    const day = date.getDate().toString().padStart(2, "0")
+    return `${year}/${month}/${day}`
 }
 
 function parseSpellingBeeGrid(

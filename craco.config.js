@@ -9,8 +9,6 @@ module.exports = {
                     main: [env === "development" &&
                         require.resolve("react-dev-utils/webpackHotDevClient"), paths.appIndexJs].filter(Boolean),
                     content: [
-                        "./src/content_scripts/Utils.ts",
-
                         "./src/content_scripts/controls/ToggleButton.tsx",
 
                         "./src/content_scripts/TodaysHintsParser.ts",
