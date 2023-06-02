@@ -51,10 +51,6 @@
 }
 
 .spelling-bee-helper-main-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
     animation: fadeIn 500ms;
 }
 
@@ -104,6 +100,7 @@ tr:last-child {
     font-weight: 400;
     padding-left: 8px;
     padding-right: 8px;
+    padding-bottom: 8px;
 }
 
 .two-letter-list {
@@ -111,6 +108,7 @@ tr:last-child {
     font-weight: 400;
     padding-left: 8px;
     padding-right: 8px;
+    padding-bottom: 8px;
 }
 
 .two-letter-list-row {
@@ -131,6 +129,7 @@ tr:last-child {
 .word-totals {
     padding-left: 8px;
     padding-right: 8px;
+    padding-bottom: 8px;
     font-size: 1rem;
 }
 

@@ -6,6 +6,13 @@ import { fetchData } from "./TodaysHintsParser"
 import TwoLetterList from "./TwoLetterList"
 import BeePhoto from "./BeePhoto"
 import { UpdateErrorFunction } from "./Index"
+import {
+    SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO,
+    SPH_GLOBAL_SETTING_SHOW_GRID,
+    SPH_GLOBAL_SETTING_SHOW_TOTALS,
+    SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST,
+    getSetting
+} from "./Settings"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 
@@ -38,7 +45,7 @@ const SpellingBee = ({ updateError }: Props) => {
 
     const [error, setError] = useState("")
 
-    const [beePhoto, setBeePhoto] = useState({
+    const [beePhotoDetails, setBeePhotoDetails] = useState({
         src: "",
         srcset: "",
         credit: ""
@@ -106,7 +113,7 @@ const SpellingBee = ({ updateError }: Props) => {
             setRequiredLetterCounts(todaysHintsData.letterCounts)
             setRequiredTwoLetterCounts(todaysHintsData.twoLetterCounts)
             setRequiredWordTotals(todaysHintsData.requiredWordTotals)
-            setBeePhoto(todaysHintsData.beePhoto)
+            setBeePhotoDetails(todaysHintsData.beePhoto)
 
             const foundWordsData = updateFoundWords()
             setFoundLetterCounts(foundWordsData.letterCounts)
@@ -127,21 +134,74 @@ const SpellingBee = ({ updateError }: Props) => {
         updateError(error)
     }, [error, updateError])
 
+    const wordTotals = () => {
+        if (getSetting(SPH_GLOBAL_SETTING_SHOW_TOTALS)) {
+            return <WordTotals requiredWordTotals={requiredWordTotals} />
+        } else {
+            return <></>
+        }
+    }
+
+    const spellingBeeGrid = () => {
+        if (getSetting(SPH_GLOBAL_SETTING_SHOW_GRID)) {
+            return <SpellingBeeGrid
+                requiredWordLengths={requiredWordLengths}
+                requiredLetterCounts={requiredLetterCounts}
+                foundLetterCounts={foundLetterCounts}
+                foundWordLengths={foundWordLengths} />
+        } else {
+            return <></>
+        }
+    }
+
+    const towLetterList = () => {
+        if (getSetting(SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST)) {
+            return <TwoLetterList
+                requiredTwoLetterCounts={requiredTwoLetterCounts}
+                foundTwoLetterCounts={foundTwoLetterCounts} />
+        } else {
+            return <></>
+        }
+    }
+
+    const beePhoto = () => {
+        if (getSetting(SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO)) {
+            return <BeePhoto
+                src={beePhotoDetails.src}
+                srcset={beePhotoDetails.srcset}
+                credit={beePhotoDetails.credit} />
+        } else {
+            return <></>
+        }
+    }
+
+    const checkNoHelpersEnabled = () => {
+        if (
+            !getSetting(SPH_GLOBAL_SETTING_SHOW_TOTALS) &&
+            !getSetting(SPH_GLOBAL_SETTING_SHOW_GRID) &&
+            !getSetting(SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST) &&
+            !getSetting(SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO)
+        ) {
+            return <>
+                <p className="spelling-bee-helper-error">
+                    No Spelling Bee Helpers enabled.
+                </p>
+                <p className="spelling-bee-helper-error">
+                    Please check your settings.
+                </p>
+            </>
+        } else {
+            return <></>
+        }
+    }
+
     return <div className="spelling-bee-helper-main-container">
-        <WordTotals
-            requiredWordTotals={requiredWordTotals} />
-        <SpellingBeeGrid
-            requiredWordLengths={requiredWordLengths}
-            requiredLetterCounts={requiredLetterCounts}
-            foundLetterCounts={foundLetterCounts}
-            foundWordLengths={foundWordLengths} />
-        <TwoLetterList
-            requiredTwoLetterCounts={requiredTwoLetterCounts}
-            foundTwoLetterCounts={foundTwoLetterCounts} />
-        <BeePhoto
-            src={beePhoto.src}
-            srcset={beePhoto.srcset}
-            credit={beePhoto.credit} />
+        {wordTotals()}
+        {spellingBeeGrid()}
+        {towLetterList()}
+        {beePhoto()}
+
+        {checkNoHelpersEnabled()}
     </div>
 }
 
