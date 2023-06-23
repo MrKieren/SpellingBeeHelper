@@ -3,7 +3,7 @@
   "name": "Spelling Bee Helper",
   "description": "A helper for NYT Spelling Bee game which keeps a count of the words you've found.",
   "homepage_url": "https://www.nytimes.com/puzzles/spelling-bee",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "manifest_version": 3,
   "icons": {
     "16": "img/spelling_bee_icon_16.png",
