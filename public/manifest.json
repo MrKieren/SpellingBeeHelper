@@ -32,11 +32,10 @@
     {
       "resources": [ "img/settings_cog.svg", "img/back_arrow.svg" ],
       "matches": [ 
-        "https://www.nytimes.com/puzzles/spelling-bee",
-        "https://nytimes.com/puzzles/spelling-bee"
+        "https://www.nytimes.com/*",
+        "https://nytimes.com/*"
        ]
     }
-    
   ],
   "browser_specific_settings": {
     "gecko": {
