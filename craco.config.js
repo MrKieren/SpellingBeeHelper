@@ -10,6 +10,7 @@ module.exports = {
                         require.resolve("react-dev-utils/webpackHotDevClient"), paths.appIndexJs].filter(Boolean),
                     content: [
                         "./src/content_scripts/controls/ToggleButton.tsx",
+                        "./src/content_scripts/controls/CheckBox.tsx",
 
                         "./src/content_scripts/TodaysHintsParser.ts",
 
@@ -24,7 +25,9 @@ module.exports = {
 
                         "./src/content_scripts/ErrorView.tsx",
 
-                        "./src/content_scripts/Settings.tsx"
+                        "./src/content_scripts/Settings.tsx",
+
+                        "./src/content_scripts/AutoStart.tsx"
                     ]
                 },
                 output: {

@@ -1,0 +1,59 @@
+.sbh-check-box {
+    display: flex;
+    position: relative;
+    align-items: center;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.sbh-check-box input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: relative;
+    height: 30px;
+    width: 30px;
+    background-color: black;
+    border: 1px solid #fff;
+}
+
+.sbh-check-box:hover input~.checkmark {
+    background-color: #3f3f3f;
+}
+
+.sbh-check-box input:checked~.checkmark {
+    background-color: black;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.sbh-check-box input:checked~.checkmark:after {
+    display: block;
+}
+
+.sbh-check-box .checkmark:after {
+    left: 9px;
+    top: 1px;
+    width: 10px;
+    height: 20px;
+    border: solid #F7DA21;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}

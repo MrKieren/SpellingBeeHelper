@@ -186,3 +186,11 @@ tr:last-child {
 .spelling-bee-helper-bee-photo-overlay-close:before {
     content: "close ×";
 }
+
+.sbh-skip-welcome {
+    padding-top: 12px;
+}
+
+.sbh-skip-welcome, .sbh-skip-congrats {
+    display: inline-block;
+}

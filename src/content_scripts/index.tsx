@@ -3,6 +3,7 @@ import ReactDOM from "react-dom"
 import SpellingBee from "./SpellingBeeHelper"
 import ErrorView from "./ErrorView"
 import Settings from "./Settings"
+import AutoStart from "./AutoStart"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 
@@ -121,7 +122,10 @@ function render() {
     contentBox[0].appendChild(wordListWindow)
 
     ReactDOM.render(
-        <SpellingBeeHelper />,
+        <>
+            <AutoStart />
+            <SpellingBeeHelper />
+        </>,
         document.getElementById(SPELLING_BEE_CONTENT_AREA)
     )
 }

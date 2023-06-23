@@ -52,10 +52,6 @@ input:checked+.spelling-bee-helper-slider {
     background-color: #F7DA21;
 }
 
-input:focus+.spelling-bee-helper-slider {
-    box-shadow: 0 0 1px #F7DA21;
-}
-
 input:checked+.spelling-bee-helper-slider:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);

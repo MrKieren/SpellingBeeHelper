@@ -7,10 +7,10 @@ import TwoLetterList from "./TwoLetterList"
 import BeePhoto from "./BeePhoto"
 import { UpdateErrorFunction } from "./Index"
 import {
-    SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO,
-    SPH_GLOBAL_SETTING_SHOW_GRID,
-    SPH_GLOBAL_SETTING_SHOW_TOTALS,
-    SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST,
+    GLOBAL_SETTING_SHOW_BEE_PHOTO,
+    GLOBAL_SETTING_SHOW_GRID,
+    GLOBAL_SETTING_SHOW_TOTALS,
+    GLOBAL_SETTING_SHOW_TWO_LETTER_LIST,
     getSetting
 } from "./Settings"
 
@@ -135,7 +135,7 @@ const SpellingBee = ({ updateError }: Props) => {
     }, [error, updateError])
 
     const wordTotals = () => {
-        if (getSetting(SPH_GLOBAL_SETTING_SHOW_TOTALS)) {
+        if (getSetting(GLOBAL_SETTING_SHOW_TOTALS, true)) {
             return <WordTotals requiredWordTotals={requiredWordTotals} />
         } else {
             return <></>
@@ -143,7 +143,7 @@ const SpellingBee = ({ updateError }: Props) => {
     }
 
     const spellingBeeGrid = () => {
-        if (getSetting(SPH_GLOBAL_SETTING_SHOW_GRID)) {
+        if (getSetting(GLOBAL_SETTING_SHOW_GRID, true)) {
             return <SpellingBeeGrid
                 requiredWordLengths={requiredWordLengths}
                 requiredLetterCounts={requiredLetterCounts}
@@ -155,7 +155,7 @@ const SpellingBee = ({ updateError }: Props) => {
     }
 
     const towLetterList = () => {
-        if (getSetting(SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST)) {
+        if (getSetting(GLOBAL_SETTING_SHOW_TWO_LETTER_LIST, true)) {
             return <TwoLetterList
                 requiredTwoLetterCounts={requiredTwoLetterCounts}
                 foundTwoLetterCounts={foundTwoLetterCounts} />
@@ -165,7 +165,7 @@ const SpellingBee = ({ updateError }: Props) => {
     }
 
     const beePhoto = () => {
-        if (getSetting(SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO)) {
+        if (getSetting(GLOBAL_SETTING_SHOW_BEE_PHOTO, true)) {
             return <BeePhoto
                 src={beePhotoDetails.src}
                 srcset={beePhotoDetails.srcset}
@@ -177,10 +177,10 @@ const SpellingBee = ({ updateError }: Props) => {
 
     const checkNoHelpersEnabled = () => {
         if (
-            !getSetting(SPH_GLOBAL_SETTING_SHOW_TOTALS) &&
-            !getSetting(SPH_GLOBAL_SETTING_SHOW_GRID) &&
-            !getSetting(SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST) &&
-            !getSetting(SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO)
+            !getSetting(GLOBAL_SETTING_SHOW_TOTALS, true) &&
+            !getSetting(GLOBAL_SETTING_SHOW_GRID, true) &&
+            !getSetting(GLOBAL_SETTING_SHOW_TWO_LETTER_LIST, true) &&
+            !getSetting(GLOBAL_SETTING_SHOW_BEE_PHOTO, true)
         ) {
             return <>
                 <p className="spelling-bee-helper-error">

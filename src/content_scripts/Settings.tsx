@@ -1,12 +1,16 @@
 import ToggleButton from "./controls/ToggleButton"
 
 const SPH_GLOBAL_SETTINGS = "SPH_GLOBAL_SETTINGS"
-export const SPH_GLOBAL_SETTING_SHOW_TOTALS = "SPH_GLOBAL_SETTING_SHOW_TOTALS"
-export const SPH_GLOBAL_SETTING_SHOW_GRID = "SPH_GLOBAL_SETTING_SHOW_GRID"
-export const SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST =
+export const GLOBAL_SETTING_SHOW_TOTALS = "SPH_GLOBAL_SETTING_SHOW_TOTALS"
+export const GLOBAL_SETTING_SHOW_GRID = "SPH_GLOBAL_SETTING_SHOW_GRID"
+export const GLOBAL_SETTING_SHOW_TWO_LETTER_LIST =
     "SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST"
-export const SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO =
+export const GLOBAL_SETTING_SHOW_BEE_PHOTO =
     "SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO"
+export const GLOBAL_SETTING_SKIP_WELCOME_SCREEN =
+    "SPH_GLOBAL_SETTING_SKIP_WELCOME_SCREEN"
+export const GLOBAL_SETTING_SKIP_CONGRATS_SCREEN =
+    "SPH_GLOBAL_SETTING_SKIP_CONGRATS_SCREEN"
 
 const saveSetting = (key: string, value: boolean) => {
     let globalSettings = JSON.parse(
@@ -19,54 +23,56 @@ const saveSetting = (key: string, value: boolean) => {
     }))
 }
 
-export const getSetting = (key: string) => {
+export const getSetting = (key: string, defaultValue: any) => {
     let allIndexes = JSON.parse(
         window.localStorage.getItem(SPH_GLOBAL_SETTINGS) ?? "{}"
     )
-    return allIndexes[key] ?? true
+    return allIndexes[key] ?? defaultValue
+}
+
+export const handleSettingToggle = (isToggled: boolean, tag: any) => {
+    if (tag) {
+        saveSetting(tag as string, isToggled)
+    }
 }
 
 const Settings = () => {
-    const handleShowTotalsChange = (isToggled: boolean) => {
-        saveSetting(SPH_GLOBAL_SETTING_SHOW_TOTALS, isToggled)
-    }
-
-    const handleShowSpellingBeeGridChange = (isToggled: boolean) => {
-        saveSetting(SPH_GLOBAL_SETTING_SHOW_GRID, isToggled)
-    }
-
-    const handleShowTwoLetterListChange = (isToggled: boolean) => {
-        saveSetting(SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST, isToggled)
-    }
-
-    const handleShowBeePhotoChange = (isToggled: boolean) => {
-        saveSetting(SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO, isToggled)
-    }
-
     return <>
         <div className="spelling-bee-helper-settings-container">
             <p className="spelling-bee-helper-title">
                 Settings
             </p>
 
-            <div>
-                <ToggleButton
-                    label="Show totals"
-                    initialValue={getSetting(SPH_GLOBAL_SETTING_SHOW_TOTALS)}
-                    onChange={handleShowTotalsChange} />
-                <ToggleButton
-                    label="Show spelling bee grid"
-                    initialValue={getSetting(SPH_GLOBAL_SETTING_SHOW_GRID)}
-                    onChange={handleShowSpellingBeeGridChange} />
-                <ToggleButton
-                    label="Show two letter list"
-                    initialValue={getSetting(SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST)}
-                    onChange={handleShowTwoLetterListChange} />
-                <ToggleButton
-                    label="Show bee photo"
-                    initialValue={getSetting(SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO)}
-                    onChange={handleShowBeePhotoChange} />
-            </div>
+            <ToggleButton
+                label="Show totals"
+                initialValue={getSetting(GLOBAL_SETTING_SHOW_TOTALS, true)}
+                onChange={handleSettingToggle}
+                tag={GLOBAL_SETTING_SHOW_TOTALS} />
+            <ToggleButton
+                label="Show spelling bee grid"
+                initialValue={getSetting(GLOBAL_SETTING_SHOW_GRID, true)}
+                onChange={handleSettingToggle}
+                tag={GLOBAL_SETTING_SHOW_GRID} />
+            <ToggleButton
+                label="Show two letter list"
+                initialValue={getSetting(GLOBAL_SETTING_SHOW_TWO_LETTER_LIST, true)}
+                onChange={handleSettingToggle}
+                tag={GLOBAL_SETTING_SHOW_TWO_LETTER_LIST} />
+            <ToggleButton
+                label="Show bee photo"
+                initialValue={getSetting(GLOBAL_SETTING_SHOW_BEE_PHOTO, true)}
+                onChange={handleSettingToggle}
+                tag={GLOBAL_SETTING_SHOW_BEE_PHOTO} />
+            <ToggleButton
+                label="Skip welcome screen"
+                initialValue={getSetting(GLOBAL_SETTING_SKIP_WELCOME_SCREEN, false)}
+                onChange={handleSettingToggle}
+                tag={GLOBAL_SETTING_SKIP_WELCOME_SCREEN} />
+            <ToggleButton
+                label="Skip congratulations screen"
+                initialValue={getSetting(GLOBAL_SETTING_SKIP_CONGRATS_SCREEN, false)}
+                onChange={handleSettingToggle}
+                tag={GLOBAL_SETTING_SKIP_CONGRATS_SCREEN} />
         </div>
     </>
 }

@@ -3,10 +3,11 @@ import { useEffect, useState } from "react"
 type Props = {
     label: string,
     initialValue: boolean,
-    onChange: (isToggled: boolean) => void
+    onChange: (isToggled: boolean, tag: any) => void,
+    tag?: any
 }
 
-const ToggleButton: React.FC<Props> = ({ label, initialValue, onChange }) => {
+const ToggleButton: React.FC<Props> = ({ label, initialValue, onChange, tag }) => {
     const [isToggled, setIsToggled] = useState(initialValue)
 
     const handleToggle = () => {
@@ -14,8 +15,8 @@ const ToggleButton: React.FC<Props> = ({ label, initialValue, onChange }) => {
     }
 
     useEffect(() => {
-        onChange(isToggled)
-    }, [isToggled, onChange])
+        onChange(isToggled, tag)
+    }, [isToggled, tag, onChange])
 
     return (
         <div className="spelling-bee-helper-toggle-button">

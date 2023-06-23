@@ -23,7 +23,8 @@
       ],
       "css": [
         "./css/style.css",
-        "./css/toggle.css"
+        "./css/toggle.css",
+        "./css/checkbox.css"
       ]
     }
   ],
