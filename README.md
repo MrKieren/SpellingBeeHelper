@@ -10,9 +10,17 @@ You can start using the Spelling Bee helper by installing it for [Firefox](https
 
 ## Building
 
+### Dev container
+
+The project includes a dev container that sets up the build environment automatically. 
+
+Open the project in Visual Studio Code and ensure the project opens in the container.
+
+### Building
+
 If you want to build your own version of the Spelling Bee Helper follow these instructions.
 
-You’ll need to have Node installed to build. You can download the installer from the [Node website](https://nodejs.org/en).
+You’ll need to have Node installed to build. You can download the installer from the [Node website](https://nodejs.org/en). Note, if you're running in the dev container you can skip this step as the container provides Node.
 
 In the project directory, use the following command to build the project:
 
