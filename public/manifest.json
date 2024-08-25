@@ -34,7 +34,7 @@
       "matches": [ 
         "https://www.nytimes.com/*",
         "https://nytimes.com/*"
-       ]
+       ] 
     }
   ],
   "browser_specific_settings": {
