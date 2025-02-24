@@ -25,48 +25,48 @@ type BeePhoto = {
 }
 
 export async function fetchData(): Promise<TodaysHintsData> {
-    const response = await fetch(
-    `https://www.nytimes.com/${getGameDate()}/crosswords/spelling-bee-forum.html`,
-    {
-      headers: {
+    let url = `https://www.nytimes.com/${getGameDate()}/crosswords/spelling-bee-forum.html`;
+    console.log("Fetching Today's Hints from: " + url);
+
+    const response = await fetch(url, {
+        headers: {
         "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0",
         Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
+            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
         Referer: "https://www.nytimes.com/",
-      }
-    }
-  );
+        Connection: "keep-alive",
+        },
+    });
     if (!response.ok) {
         throw new Error(
             `Failed to access Today's Hints (error ${response.status}).`
-        )
+        );
     }
 
-    const html = await response.text()
+    const html = await response.text();
 
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(html, "text/html")
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
 
-    const interactiveBody =
-        doc.getElementsByClassName("interactive-body")
+    const interactiveBody = doc.getElementsByClassName("interactive-body");
     if (interactiveBody == null || interactiveBody.length !== 1) {
-        throw new Error("Failed to find hints section on Today's Hints.")
+        throw new Error("Failed to find hints section on Today's Hints.");
     }
 
-    const spellingBeeGridData = parseSpellingBeeGrid(interactiveBody[0])
-    const twoLetterCounts = parseTwoLetterList(interactiveBody[0])
-    const requiredWordTotals = parseStats(interactiveBody[0])
-    const beePhoto = parseBeePhoto(doc)
+    const spellingBeeGridData = parseSpellingBeeGrid(interactiveBody[0]);
+    const twoLetterCounts = parseTwoLetterList(interactiveBody[0]);
+    const requiredWordTotals = parseStats(interactiveBody[0]);
+    const beePhoto = parseBeePhoto(doc);
 
     return {
         wordLengths: spellingBeeGridData.wordLengths,
         letterCounts: spellingBeeGridData.letterCounts,
         twoLetterCounts: twoLetterCounts,
         requiredWordTotals: requiredWordTotals,
-        beePhoto: beePhoto
-    }
+        beePhoto: beePhoto,
+    };
 }
 
 function getGameDate() {
