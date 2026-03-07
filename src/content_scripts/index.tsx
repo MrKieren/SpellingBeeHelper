@@ -108,26 +108,54 @@ const SpellingBeeHelper = () => {
     </>
 }
 
+function waitForElement(className: string, timeout = 10000): Promise<Element> {
+    return new Promise((resolve, reject) => {
+        // Check if it's already there
+        const existing = document.getElementsByClassName(className)
+        if (existing.length === 1) {
+            resolve(existing[0])
+            return
+        }
+
+        const observer = new MutationObserver(() => {
+            const el = document.getElementsByClassName(className)
+            if (el.length === 1) {
+                observer.disconnect()
+                resolve(el[0])
+            }
+        })
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        })
+
+        setTimeout(() => {
+            observer.disconnect()
+            reject(new Error(`Timed out waiting for element: .${className}`))
+        }, timeout)
+    })
+}
+
 function render() {
-    const contentBox = document.getElementsByClassName("sb-content-box")
-    if (contentBox == null || contentBox.length !== 1) {
-        console.log("Failed to find content box.")
-        return
-    }
+    waitForElement("sb-content-box")
+        .then((contentBox) => {
+            const wordListWindow = document.createElement("div")
+            wordListWindow.setAttribute("class", SPELLING_BEE_CONTENT_AREA)
+            wordListWindow.setAttribute("id", SPELLING_BEE_CONTENT_AREA)
+            contentBox.appendChild(wordListWindow)
 
-    const wordListWindow = document.createElement("div")
-    wordListWindow.setAttribute("class", SPELLING_BEE_CONTENT_AREA)
-    wordListWindow.setAttribute("id", SPELLING_BEE_CONTENT_AREA)
-
-    contentBox[0].appendChild(wordListWindow)
-
-    ReactDOM.render(
-        <>
-            <AutoStart />
-            <SpellingBeeHelper />
-        </>,
-        document.getElementById(SPELLING_BEE_CONTENT_AREA)
-    )
+            ReactDOM.render(
+                <>
+                    <AutoStart />
+                    <SpellingBeeHelper />
+                </>,
+                document.getElementById(SPELLING_BEE_CONTENT_AREA)
+            )
+        })
+        .catch((err) => {
+            console.error("Spelling Bee Helper:", err.message)
+        })
 }
 
 console.log("Loading Spelling Bee Helper.")
