@@ -50,7 +50,7 @@ export async function fetchData(): Promise<TodaysHintsData> {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
 
-    const interactiveBody = doc.getElementsByClassName("interactive-body");
+    const interactiveBody = doc.getElementsByClassName("sb-forum-embedded-interactive");
     if (interactiveBody == null || interactiveBody.length !== 1) {
         throw new Error("Failed to find hints section on Today's Hints.");
     }

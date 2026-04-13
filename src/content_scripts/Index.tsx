@@ -4,6 +4,7 @@ import SpellingBee from "./SpellingBeeHelper"
 import ErrorView from "./ErrorView"
 import Settings from "./Settings"
 import AutoStart from "./AutoStart"
+import { waitForElement } from "./Utils"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
 
@@ -108,36 +109,20 @@ const SpellingBeeHelper = () => {
     </>
 }
 
-function waitForElement(className: string, timeout = 10000): Promise<Element> {
-    return new Promise((resolve, reject) => {
-        // Check if it's already there
-        const existing = document.getElementsByClassName(className)
-        if (existing.length === 1) {
-            resolve(existing[0])
-            return
-        }
 
-        const observer = new MutationObserver(() => {
-            const el = document.getElementsByClassName(className)
-            if (el.length === 1) {
-                observer.disconnect()
-                resolve(el[0])
-            }
+function render() {   
+    waitForElement("pz-moment__container")
+        .then((contentBox) => {
+            const autoStartContainer = document.createElement("div")
+            autoStartContainer.id = "sbh-autostart"
+            contentBox.appendChild(autoStartContainer)
+
+            ReactDOM.render(<AutoStart />, document.getElementById(autoStartContainer.id))
+        })
+        .catch((err) => {
+            console.error("Spelling Bee Helper:", err.message)
         })
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-        })
-
-        setTimeout(() => {
-            observer.disconnect()
-            reject(new Error(`Timed out waiting for element: .${className}`))
-        }, timeout)
-    })
-}
-
-function render() {
     waitForElement("sb-content-box")
         .then((contentBox) => {
             const wordListWindow = document.createElement("div")
@@ -146,10 +131,7 @@ function render() {
             contentBox.appendChild(wordListWindow)
 
             ReactDOM.render(
-                <>
-                    <AutoStart />
-                    <SpellingBeeHelper />
-                </>,
+                <SpellingBeeHelper />,
                 document.getElementById(SPELLING_BEE_CONTENT_AREA)
             )
         })

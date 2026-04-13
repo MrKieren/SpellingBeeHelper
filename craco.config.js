@@ -12,6 +12,7 @@ module.exports = {
                         "./src/content_scripts/controls/ToggleButton.tsx",
                         "./src/content_scripts/controls/CheckBox.tsx",
 
+                        "./src/content_scripts/Utils.tsx",
                         "./src/content_scripts/TodaysHintsParser.ts",
 
                         "./src/content_scripts/Index.tsx",

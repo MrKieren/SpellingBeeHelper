@@ -8,55 +8,36 @@ import {
 import { render } from "react-dom"
 import CheckBox from "./controls/CheckBox"
 
-const GAME_MOMENTS = "portal-game-moments"
+const GAME_MOMENTS = "js-hook-pz-moment__game"
 
-const WELCOME_SCREEN = "js-hook-pz-moment__welcome"
-const CONGRATS_SCREEN = "js-hook-pz-moment__congrats"
+const WELCOME_SCREEN = ".pz-moment__welcome"
+const CONGRATS_SCREEN = ".pz-moment__congrats"
 
 const BUTTON_WRAPPER = ".pz-moment__content"
 const MOMENT_BUTTONS = ".pz-moment__button.primary.default"
-const MOMENT_CONTAINER = ".pz-moment__container"
 const MOMENT_CLOSE_TEXT = ".pz-moment__close_text"
-
-const ON_STAGE = "on-stage"
-const FLY_OUT = "fly-out"
 
 const SKIP_WELCOME_SECTION = "sbh-skip-welcome"
 const SKIP_CONGRATS_SECTION = "sbh-skip-congrats"
 
-const isScreenVisible = (
-    screen: string,
-    mutationElement: HTMLElement
-): boolean => {
-    if (mutationElement.id !== screen) {
-        return false
-    }
-
-    const screenElement = document.getElementById(screen)
-    if (!screenElement) {
-        return false
-    }
-
-    return screenElement.classList.contains(ON_STAGE) &&
-        !screenElement.classList.contains(FLY_OUT)
+const isScreenVisible = (className: string): boolean => {
+    const el = document.querySelector(className) as HTMLElement | null
+    if (!el) return false
+    return el.offsetHeight > 0
 }
 
-const closeWelcomeScreen = (mutationElement: HTMLElement) => {
-    if (!isScreenVisible(WELCOME_SCREEN, mutationElement)) {
+const closeWelcomeScreen = () => {
+    if (!isScreenVisible(WELCOME_SCREEN)) {
         return
     }
 
-    const loadingScreen =
-        document.querySelector(MOMENT_CONTAINER) as HTMLElement
-    loadingScreen.style.display = "none"
-
-    const momentButton =
-        mutationElement.querySelector(MOMENT_BUTTONS) as HTMLButtonElement
-    momentButton.click()
+    const welcomeEl = document.querySelector(WELCOME_SCREEN) as HTMLElement
+    const momentButton = welcomeEl.querySelector(MOMENT_BUTTONS) as HTMLButtonElement | null
+    if (momentButton) momentButton.click()
 }
 
-const closeCongratsScreen = (mutationElement: HTMLElement) => {
-    if (!isScreenVisible(CONGRATS_SCREEN, mutationElement)) {
+const closeCongratsScreen = () => {
+    if (!isScreenVisible(CONGRATS_SCREEN)) {
         return
     }
 
@@ -65,26 +46,30 @@ const closeCongratsScreen = (mutationElement: HTMLElement) => {
     momentButtons.click()
 }
 
-const addButtonArea = (mutationElement: HTMLElement, id: string): HTMLDivElement => {
-    const buttonWrapper =
-        mutationElement.querySelector(BUTTON_WRAPPER) as HTMLDivElement
-
+const addButtonArea = (screenClassName: string, id: string): HTMLDivElement | null => {
+    const screenEl = document.querySelector(screenClassName) as HTMLElement | null
+    if (!screenEl) return null
+ 
+    const buttonWrapper = screenEl.querySelector(BUTTON_WRAPPER) as HTMLDivElement | null
+    if (!buttonWrapper) return null
+ 
+    const existing = document.getElementById(id)
+    if (existing) return existing as HTMLDivElement
+ 
     const container = document.createElement("div")
-    if (!document.getElementById(id)) {
-        container.id = id
-        container.classList.add(id)
-        buttonWrapper.appendChild(container)
-    }
-
+    container.id = id
+    container.classList.add(id)
+    buttonWrapper.appendChild(container)
     return container
 }
 
-const addAutoSkipWelcomeScreenOption = (mutationElement: HTMLElement) => {
-    if (!isScreenVisible(WELCOME_SCREEN, mutationElement)) {
+const addAutoSkipWelcomeScreenOption = () => {
+    if (!isScreenVisible(WELCOME_SCREEN)) {
         return
     }
 
-    const container = addButtonArea(mutationElement, SKIP_WELCOME_SECTION)
+    const container = addButtonArea(WELCOME_SCREEN, SKIP_WELCOME_SECTION)
+    if (!container) return
 
     render(
         <CheckBox
@@ -96,12 +81,12 @@ const addAutoSkipWelcomeScreenOption = (mutationElement: HTMLElement) => {
     )
 }
 
-const addAutoSkipCongratsScreenOption = (mutationElement: HTMLElement) => {
-    if (!isScreenVisible(CONGRATS_SCREEN, mutationElement)) {
+const addAutoSkipCongratsScreenOption = () => {
+    if (!isScreenVisible(CONGRATS_SCREEN)) {
         return
     }
 
-    const container = addButtonArea(mutationElement, SKIP_CONGRATS_SECTION)
+    const container = addButtonArea(CONGRATS_SCREEN, SKIP_CONGRATS_SECTION)
 
     render(
         <CheckBox
@@ -121,22 +106,18 @@ const AutoStart = () => {
             return
         }
 
-        const observer = new MutationObserver((mutationsList) => {
-            mutationsList.forEach((mutation) => {
-                const targetElement = mutation.target as HTMLElement
+        const observer = new MutationObserver(() => {
+            if (getSetting(GLOBAL_SETTING_SKIP_WELCOME_SCREEN, false)) {
+                closeWelcomeScreen()
+            } else {
+                addAutoSkipWelcomeScreenOption()
+            }
 
-                if (getSetting(GLOBAL_SETTING_SKIP_WELCOME_SCREEN, false)) {
-                    closeWelcomeScreen(targetElement)
-                } else {
-                    addAutoSkipWelcomeScreenOption(targetElement)
-                }
-
-                if (getSetting(GLOBAL_SETTING_SKIP_CONGRATS_SCREEN, false)) {
-                    closeCongratsScreen(targetElement)
-                } else {
-                    addAutoSkipCongratsScreenOption(targetElement)
-                }
-            })
+            if (getSetting(GLOBAL_SETTING_SKIP_CONGRATS_SCREEN, false)) {
+                closeCongratsScreen()
+            } else {
+                addAutoSkipCongratsScreenOption()
+            }
         })
 
         const observerConfig = {
