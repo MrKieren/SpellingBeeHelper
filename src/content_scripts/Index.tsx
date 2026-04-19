@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import ReactDOM from "react-dom"
 import SpellingBee from "./SpellingBeeHelper"
 import ErrorView from "./ErrorView"
@@ -26,12 +26,23 @@ const SpellingBeeHelper = () => {
 
     const [minWidth, setMinWidth] = useState(280)
 
-    const updateError = (newError: string) => {
+    const updateError = useCallback((newError: string) => {
         setError(newError)
-    }
+    }, [])
 
     const settingsCog = chrome.runtime.getURL("img/settings_cog.svg")
     const backArrow = chrome.runtime.getURL("img/back_arrow.svg")
+
+    useEffect(() => {
+        const containerBox = document.getElementsByClassName("spelling-bee-helper")[0]
+        if (!containerBox) return
+        const observer = new ResizeObserver(([entry]) => {
+            const width = entry.contentRect.width
+            setMinWidth(prev => width > prev ? width : prev)
+        })
+        observer.observe(containerBox)
+        return () => observer.disconnect()
+    }, [])
 
     useEffect(() => {
         if (error.length > 0) {
@@ -49,39 +60,10 @@ const SpellingBeeHelper = () => {
         }
     }, [isSettingsOpen])
 
-    const toggleSettings = () => {
-        setIsSettingsOpen(!isSettingsOpen)
-
+    const toggleSettings = useCallback(() => {
+        setIsSettingsOpen(prev => !prev)
         settingButton.current?.classList.toggle("flipped")
-    }
-
-    const updateMinContainerWidth = () => {
-        const containerBox =
-            document.getElementsByClassName("spelling-bee-helper")
-        if (containerBox == null || containerBox.length !== 1) {
-            console.log("Failed to find container box.")
-            return
-        }
-
-        const currentWidth =
-            Number(containerBox[0].getBoundingClientRect().width)
-        if (currentWidth > minWidth) {
-            setMinWidth(currentWidth)
-        }
-    }
-
-    const renderView = () => {
-        updateMinContainerWidth()
-
-        switch (currentView) {
-            case Views.INDEX:
-                return <SpellingBee updateError={updateError} />
-            case Views.ERROR:
-                return <ErrorView error={error} />
-            case Views.SETTINGS:
-                return <Settings />
-        }
-    }
+    }, [])
 
     return <>
         <div className="spelling-bee-helper sb-wordlist-box" style={{ minWidth: minWidth + "px" }}>
@@ -104,11 +86,14 @@ const SpellingBeeHelper = () => {
                 </button>
             </div>
 
-            {renderView()}
-        </div>
+            <div style={{ display: currentView === Views.INDEX ? "block" : "none" }}>
+                <SpellingBee updateError={updateError} />
+            </div>
+            {currentView === Views.ERROR && <ErrorView error={error} />}
+            {currentView === Views.SETTINGS && <Settings />}
+            </div>
     </>
 }
-
 
 function render() {   
     waitForElement("pz-moment__container")

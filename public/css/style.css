@@ -194,3 +194,8 @@ tr:last-child {
 .sbh-skip-welcome, .sbh-skip-congrats {
     display: inline-block;
 }
+
+.word-length-display {
+    color: gray;
+    font-weight: normal;
+}

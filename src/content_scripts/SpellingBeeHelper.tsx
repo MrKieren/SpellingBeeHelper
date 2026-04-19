@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { updateFoundWords } from "./FoundWordsParser"
+import { updateFoundWords, updateWordLengthDisplay } from "./FoundWordsParser"
 import WordTotals from "./WordTotals"
 import SpellingBeeGrid from "./SpellingBeeGrid"
 import { fetchData } from "./TodaysHintsParser"
@@ -11,7 +11,9 @@ import {
     GLOBAL_SETTING_SHOW_GRID,
     GLOBAL_SETTING_SHOW_TOTALS,
     GLOBAL_SETTING_SHOW_TWO_LETTER_LIST,
-    getSetting
+    GLOBAL_SETTING_UPDATE_WORD_LENGTHS,
+    getSetting,
+    SPH_SETTINGS_CHANGED_EVENT
 } from "./Settings"
 
 export const SPELLING_BEE_CONTENT_AREA = "spelling-bee-content-area"
@@ -67,6 +69,9 @@ const SpellingBee = ({ updateError }: Props) => {
                 setFoundLetterCounts(foundWordsData.letterCounts)
                 setFoundTwoLetterCounts(foundWordsData.twoLetterCounts)
                 setFoundWordLengths(foundWordsData.wordLengthCounts)
+
+                const showWordLengths = getSetting(GLOBAL_SETTING_UPDATE_WORD_LENGTHS, true)
+                updateWordLengthDisplay(showWordLengths)
             }
         })
 
@@ -95,6 +100,10 @@ const SpellingBee = ({ updateError }: Props) => {
                 setFoundLetterCounts(foundWordsData.letterCounts)
                 setFoundTwoLetterCounts(foundWordsData.twoLetterCounts)
                 setFoundWordLengths(foundWordsData.wordLengthCounts)
+
+                if (getSetting(GLOBAL_SETTING_UPDATE_WORD_LENGTHS, true)) {
+                    updateWordLengthDisplay()
+                }
             }
         })
 
@@ -119,10 +128,29 @@ const SpellingBee = ({ updateError }: Props) => {
             setFoundLetterCounts(foundWordsData.letterCounts)
             setFoundTwoLetterCounts(foundWordsData.twoLetterCounts)
             setFoundWordLengths(foundWordsData.wordLengthCounts)
+
+            if (getSetting(GLOBAL_SETTING_UPDATE_WORD_LENGTHS, true)) {
+                updateWordLengthDisplay()
+            }
         } catch (error: any) {
             setError((error as Error).message)
         }
     }, [])
+
+    // Listen for setting changes via custom events (when toggle is changed in Settings)
+    const handleSettingChange = useCallback((event: CustomEvent) => {
+        const { setting, value } = event.detail
+        if (setting === GLOBAL_SETTING_UPDATE_WORD_LENGTHS) {
+            updateWordLengthDisplay(value)
+        }
+    }, [])
+
+    useEffect(() => {
+        window.addEventListener(SPH_SETTINGS_CHANGED_EVENT, handleSettingChange as EventListener)
+        return () => {
+            window.removeEventListener(SPH_SETTINGS_CHANGED_EVENT, handleSettingChange as EventListener)
+        }
+    }, [handleSettingChange])
 
     useEffect(() => {
         watchGameScreenAppear()

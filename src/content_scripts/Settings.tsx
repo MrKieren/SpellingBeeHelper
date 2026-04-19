@@ -1,12 +1,15 @@
 import ToggleButton from "./controls/ToggleButton"
 
 const SPH_GLOBAL_SETTINGS = "SPH_GLOBAL_SETTINGS"
+export const SPH_SETTINGS_CHANGED_EVENT = "spb-settings-changed"
 export const GLOBAL_SETTING_SHOW_TOTALS = "SPH_GLOBAL_SETTING_SHOW_TOTALS"
 export const GLOBAL_SETTING_SHOW_GRID = "SPH_GLOBAL_SETTING_SHOW_GRID"
 export const GLOBAL_SETTING_SHOW_TWO_LETTER_LIST =
     "SPH_GLOBAL_SETTING_SHOW_TWO_LETTER_LIST"
 export const GLOBAL_SETTING_SHOW_BEE_PHOTO =
     "SPH_GLOBAL_SETTING_SHOW_BEE_PHOTO"
+export const GLOBAL_SETTING_UPDATE_WORD_LENGTHS =
+    "SPH_GLOBAL_SETTING_UPDATE_WORD_LENGTHS"
 export const GLOBAL_SETTING_SKIP_WELCOME_SCREEN =
     "SPH_GLOBAL_SETTING_SKIP_WELCOME_SCREEN"
 export const GLOBAL_SETTING_SKIP_CONGRATS_SCREEN =
@@ -33,6 +36,9 @@ export const getSetting = (key: string, defaultValue: any) => {
 export const handleSettingToggle = (isToggled: boolean, tag: any) => {
     if (tag) {
         saveSetting(tag as string, isToggled)
+        window.dispatchEvent(new CustomEvent(SPH_SETTINGS_CHANGED_EVENT, {
+            detail: { setting: tag, value: isToggled }
+        }))
     }
 }
 
@@ -63,6 +69,11 @@ const Settings = () => {
                 initialValue={getSetting(GLOBAL_SETTING_SHOW_BEE_PHOTO, true)}
                 onChange={handleSettingToggle}
                 tag={GLOBAL_SETTING_SHOW_BEE_PHOTO} />
+            <ToggleButton
+                label="Show word lengths"
+                initialValue={getSetting(GLOBAL_SETTING_UPDATE_WORD_LENGTHS, true)}
+                onChange={handleSettingToggle}
+                tag={GLOBAL_SETTING_UPDATE_WORD_LENGTHS} />
             <ToggleButton
                 label="Skip welcome screen"
                 initialValue={getSetting(GLOBAL_SETTING_SKIP_WELCOME_SCREEN, false)}
