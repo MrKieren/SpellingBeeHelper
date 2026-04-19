@@ -43,7 +43,10 @@ const closeCongratsScreen = () => {
 
     const momentButtons =
         document.querySelector(MOMENT_CLOSE_TEXT) as HTMLButtonElement
-    momentButtons.click()
+    momentButtons?.click()
+
+    const closeButton = document.querySelector('[aria-label="Close"]') as HTMLButtonElement
+    closeButton?.click()
 }
 
 const addButtonArea = (screenClassName: string, id: string): HTMLDivElement | null => {
