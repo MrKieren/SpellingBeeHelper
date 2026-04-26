@@ -53,33 +53,59 @@ const SpellingBee = ({ updateError }: Props) => {
         credit: ""
     })
 
-    const watchEnterButton = useCallback(() => {
-        const submitButton =
-            document.getElementsByClassName("hive-action__submit")
-        if (submitButton == null || submitButton.length !== 1) {
-            console.log("Failed to find submit button.")
+     const watchWordListChanges = useCallback(() => {
+        const wordList = document.getElementsByClassName("sb-wordlist-drawer")
+        if (wordList == null || wordList.length !== 1) {
+            console.log("Failed to find word list.")
             return
         }
 
-        const observer = new MutationObserver((mutation) => {
-            const submitButtonTarget = mutation[0].target as Element
-            if (submitButtonTarget.classList.contains("push-active") ||
-                submitButtonTarget.classList.contains("action-active")) {
-                const foundWordsData = updateFoundWords()
-                setFoundLetterCounts(foundWordsData.letterCounts)
-                setFoundTwoLetterCounts(foundWordsData.twoLetterCounts)
-                setFoundWordLengths(foundWordsData.wordLengthCounts)
+        const observer = new MutationObserver((mutations) => {
+            // Check if any mutations resulted in new words being added
+            let shouldUpdate = false
+            for (const mutation of mutations) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    // Check if any of the added nodes are sb-anagram elements (actual words)
+                    for (let i = 0; i < mutation.addedNodes.length; i++) {
+                        const node = mutation.addedNodes[i]
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            const element = node as Element
+                            if (element.classList?.contains("sb-anagram")) {
+                                shouldUpdate = true
+                                break
+                            }
+                            // Also check if any child elements are sb-anagram
+                            if (element.querySelector?.(".sb-anagram")) {
+                                shouldUpdate = true
+                                break
+                            }
+                        }
+                    }
+                    if (shouldUpdate) break
+                }
+            }
+            
+            if (shouldUpdate) {
+                // Add a small delay to ensure DOM is fully updated
+                setTimeout(() => {
+                    try {
+                        const foundWordsData = updateFoundWords()
+                        setFoundLetterCounts(foundWordsData.letterCounts)
+                        setFoundTwoLetterCounts(foundWordsData.twoLetterCounts)
+                        setFoundWordLengths(foundWordsData.wordLengthCounts)
 
-                const showWordLengths = getSetting(GLOBAL_SETTING_UPDATE_WORD_LENGTHS, true)
-                updateWordLengthDisplay(showWordLengths)
+                        const showWordLengths = getSetting(GLOBAL_SETTING_UPDATE_WORD_LENGTHS, true)
+                        updateWordLengthDisplay(showWordLengths)
+                    } catch (error) {
+                        console.log("Error updating found words:", error)
+                    }
+                }, 50)
             }
         })
 
-        observer.observe(submitButton[0], {
-            attributes: true,
-            attributeFilter: ["class"],
-            childList: false,
-            characterData: false
+        observer.observe(wordList[0], {
+            childList: true,
+            subtree: true
         })
     }, [])
 
@@ -154,9 +180,9 @@ const SpellingBee = ({ updateError }: Props) => {
 
     useEffect(() => {
         watchGameScreenAppear()
-        watchEnterButton()
+        watchWordListChanges()
         update()
-    }, [watchGameScreenAppear, watchEnterButton, update])
+    }, [watchGameScreenAppear, watchWordListChanges, update])
 
     useEffect(() => {
         updateError(error)
