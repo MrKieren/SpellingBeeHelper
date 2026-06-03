@@ -23,7 +23,8 @@ const SKIP_CONGRATS_SECTION = "sbh-skip-congrats"
 const isScreenVisible = (className: string): boolean => {
     const el = document.querySelector(className) as HTMLElement | null
     if (!el) return false
-    return el.offsetHeight > 0
+    
+    return getComputedStyle(el).visibility !== "hidden"
 }
 
 const closeWelcomeScreen = () => {
