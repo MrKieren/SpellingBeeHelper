@@ -6,11 +6,6 @@ type TodaysHintsData = {
     beePhoto: BeePhoto
 }
 
-type SpellingBeeGridData = {
-    wordLengths: Array<number>
-    letterCounts: Map<string, Map<number, number>>
-}
-
 type WordTotals = {
     words: number
     pangrams: number
@@ -25,227 +20,181 @@ type BeePhoto = {
 }
 
 export async function fetchData(): Promise<TodaysHintsData> {
-    let url = `https://www.nytimes.com/${getGameDate()}/crosswords/spelling-bee-forum.html`;
-    console.log("Fetching Today's Hints from: " + url);
-
-    const response = await fetch(url, {
-        headers: {
-        "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0",
-        Accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        Referer: "https://www.nytimes.com/",
-        Connection: "keep-alive",
-        },
-    });
+    const response = await fetch(
+        "https://www.nytimes.com/svc/spelling-bee/v1/active.json",
+        { credentials: "include" }
+    );
     if (!response.ok) {
-        throw new Error(
-            `Failed to access Today's Hints (error ${response.status}).`
-        );
+        throw new Error(`Failed to access Today's Hints (error ${response.status}).`);
     }
 
-    const html = await response.text();
+    const json = await response.json();
+    const todayId = json.today;
+    const puzzle = json.puzzles?.[todayId];
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-
-    const interactiveBody = doc.getElementsByClassName("sb-forum-embedded-interactive");
-    if (interactiveBody == null || interactiveBody.length !== 1) {
-        throw new Error("Failed to find hints section on Today's Hints.");
+    if (!puzzle) {
+        throw new Error("Failed to find today's puzzle data.");
     }
 
-    const spellingBeeGridData = parseSpellingBeeGrid(interactiveBody[0]);
-    const twoLetterCounts = parseTwoLetterList(interactiveBody[0]);
-    const requiredWordTotals = parseStats(interactiveBody[0]);
-    const beePhoto = parseBeePhoto(doc);
+    const answers: string[] = puzzle.answers;
+    const pangrams: string[] = puzzle.pangrams;
+
+    if (!answers || answers.length === 0) {
+        throw new Error("Failed to find puzzle answers.");
+    }
+    if (!pangrams) {
+        throw new Error("Failed to find puzzle pangrams.");
+    }
+
+    const allWords = answers.concat(pangrams);
+    const wordLengths = deriveWordLengths(allWords);
+    const letterCounts = deriveLetterCounts(allWords, wordLengths);
+    const twoLetterCounts = deriveTwoLetterCounts(allWords);
+    const requiredWordTotals = deriveWordTotals(allWords, pangrams);
+    const beePhoto = await fetchBeePhoto().catch(() => ({ src: "", srcset: "", credit: "" }));
+
+    return { wordLengths, letterCounts, twoLetterCounts, requiredWordTotals, beePhoto };
+}
+
+function deriveWordLengths(answers: string[]): number[] {
+    const seen = new Set<number>();
+    const lengths: number[] = [];
+    for (const w of answers) {
+        if (!seen.has(w.length)) { seen.add(w.length); lengths.push(w.length); }
+    }
+    return lengths.sort((a, b) => a - b);
+}
+
+function deriveLetterCounts(
+    answers: string[],
+    wordLengths: number[]
+): Map<string, Map<number, number>> {
+    const letterCounts = new Map<string, Map<number | undefined, number>>();
+
+    const seenLetters = new Set<string>();
+    const sortedLetters: string[] = [];
+    for (const w of answers) {
+        const l = w[0].toUpperCase();
+        if (!seenLetters.has(l)) { seenLetters.add(l); sortedLetters.push(l); }
+    }
+    sortedLetters.sort();
+
+    for (const letter of sortedLetters) {
+        const lenMap = new Map<number | undefined, number>();
+        for (const len of wordLengths) lenMap.set(len, 0);
+        lenMap.set(undefined, 0);
+        letterCounts.set(letter, lenMap);
+    }
+
+    // Σ row for column totals
+    const sigmaMap = new Map<number | undefined, number>();
+    for (const len of wordLengths) sigmaMap.set(len, 0);
+    sigmaMap.set(undefined, 0);
+    letterCounts.set("Σ", sigmaMap);
+
+    for (const word of answers) {
+        const letter = word[0].toUpperCase();
+        const len = word.length;
+
+        const letterMap = letterCounts.get(letter)!;
+        letterMap.set(len, (letterMap.get(len) ?? 0) + 1);
+        letterMap.set(undefined, (letterMap.get(undefined) ?? 0) + 1);
+
+        sigmaMap.set(len, (sigmaMap.get(len) ?? 0) + 1);
+        sigmaMap.set(undefined, (sigmaMap.get(undefined) ?? 0) + 1);
+    }
+
+    return letterCounts as unknown as Map<string, Map<number, number>>;
+}
+
+function deriveTwoLetterCounts(answers: string[]): Map<string, number> {
+    const counts = new Map<string, number>();
+    for (const word of answers) {
+        const key = word.slice(0, 2).toUpperCase();
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    const sorted = Array.from(counts.entries()).sort(([a], [b]) => a.localeCompare(b));
+    const result = new Map<string, number>();
+    for (const [k, v] of sorted) result.set(k, v);
+    return result;
+}
+
+function deriveWordTotals(answers: string[], pangrams: string[]): WordTotals {
+    const pangramSet = new Set(pangrams.map(w => w.toLowerCase()));
+
+    // 4-letter words: 1 point, 5+ letter words: length points, pangrams: +7 bonus
+    const points = answers.reduce((sum, word) => {
+        const base = word.length === 4 ? 1 : word.length;
+        const pangramBonus = pangramSet.has(word.toLowerCase()) ? 7 : 0;
+        return sum + base + pangramBonus;
+    }, 0);
+
+    // Perfect pangrams use each of the 7 letters exactly once, so they're exactly 7 letters long
+    const perfectPangrams = pangrams.filter(w => w.length === 7).length;
 
     return {
-        wordLengths: spellingBeeGridData.wordLengths,
-        letterCounts: spellingBeeGridData.letterCounts,
-        twoLetterCounts: twoLetterCounts,
-        requiredWordTotals: requiredWordTotals,
-        beePhoto: beePhoto,
+        words: answers.length,
+        pangrams: pangrams.length,
+        perfectPangrams,
+        points,
     };
 }
 
-function getGameDate() {
-    const gameDate = document.getElementsByClassName("pz-game-date")
+async function fetchBeePhoto(): Promise<BeePhoto> {
+    const url = `https://www.nytimes.com/${getGameDate()}/crosswords/spelling-bee-forum.html`;
+    const response = await fetch(url, { credentials: "include" });
+    if (!response.ok) throw new Error(`Photo fetch error ${response.status}`);
+
+    const doc = new DOMParser().parseFromString(await response.text(), "text/html");
+    return parseBeePhoto(doc);
+}
+
+function getGameDate(): string {
+    const gameDate = document.getElementsByClassName("pz-game-date");
     if (gameDate == null || gameDate.length !== 1) {
-        throw new Error("Failed to find game date.")
+        throw new Error("Failed to find game date.");
     }
 
-    const gameDateString = gameDate[0].textContent
+    const gameDateString = gameDate[0].textContent;
     if (gameDateString == null || gameDateString.length === 0) {
-        throw new Error("No game date data found.")
+        throw new Error("No game date data found.");
     }
 
-    const date = new Date(gameDateString)
-    const year = date.getFullYear()
-    const month = (date.getMonth() + 1).toString().padStart(2, "0")
-    const day = date.getDate().toString().padStart(2, "0")
-    return `${year}/${month}/${day}`
-}
-
-function parseSpellingBeeGrid(
-    interactiveBody: Element
-): SpellingBeeGridData {
-    const grid = interactiveBody.getElementsByTagName("table")
-    if (grid == null || grid.length !== 1) {
-        throw new Error("Failed to find Spelling Bee Grid.")
-    }
-
-    const rows = grid[0].getElementsByTagName("tr")
-
-    const wordLengths = new Array<number>()
-
-    const wordCountCells = rows[0].getElementsByTagName("td")
-    for (let i = 0; i < wordCountCells.length; i++) {
-        const data = wordCountCells[i].textContent?.trim() ?? ""
-        if (data === "-") {
-            wordLengths.push(0)
-        } else if (data.length > 0 && !isNaN(Number(data))) {
-            wordLengths.push(Number(data))
-        }
-    }
-
-    const letterCounts = new Map<string, Map<number, number>>()
-
-    for (let i = 1; i < rows.length; i++) {
-        const row = rows[i].getElementsByTagName("td")
-        const rowLetter = row[0].textContent?.trim().replace(":", "") ?? ""
-        if (rowLetter?.length === 0) {
-            console.log("Failed to get row letter.")
-            continue
-        }
-
-        letterCounts.set(rowLetter, new Map<number, number>())
-
-        for (let j = 1; j < row.length; j++) {
-            const data = row[j].textContent?.trim() ?? ""
-            if (data === "-") {
-                letterCounts.get(rowLetter)!.set(wordLengths[j - 1], 0)
-            } else if (data.length > 0 && !isNaN(Number(data))) {
-                letterCounts
-                    .get(rowLetter)!
-                    .set(wordLengths[j - 1], Number(data))
-            }
-        }
-    }
-
-    return { wordLengths, letterCounts }
-}
-
-function getPElements(
-    interactiveBody: Element
-): HTMLCollectionOf<HTMLParagraphElement> {
-    const pElements = interactiveBody.getElementsByTagName("p")
-    if (pElements === null || pElements.length === 0) {
-        throw new Error("Failed to find any hints in Today's Hints.")
-    }
-    return pElements
-}
-
-function parseTwoLetterList(interactiveBody: Element): Map<string, number> {
-    const pElements = getPElements(interactiveBody)
-    const twoLetterList = pElements[pElements.length - 1]
-        .getElementsByTagName("span")
-
-    const twoLetterCounts = new Map<string, number>()
-    for (let i = 0; i < twoLetterList.length; i++) {
-        const data = twoLetterList[i].textContent?.trim() ?? ""
-        const splitData = data.split(" ")
-
-        for (let j = 0; j < splitData.length; j++) {
-            const itemCount = splitData[j].split("-")
-            if (itemCount.length !== 2) {
-                console.log("Invalid two letter count: " + splitData[j])
-                continue
-            }
-
-            twoLetterCounts.set(itemCount[0], Number(itemCount[1]))
-        }
-    }
-
-    return twoLetterCounts
-}
-
-function parseStats(interactiveBody: Element): WordTotals {
-    const pElements = getPElements(interactiveBody)
-    const stats = Array.from(pElements).find(element => {
-        return element.innerHTML.includes("PANGRAMS")
-    })
-    if (stats === null) {
-        throw new Error("Failed to find game stats.")
-    }
-
-    const content = stats?.innerHTML
-    const contentParts = content?.split(",")
-
-    var words = 0
-    var pangrams = 0
-    var perfectPangrams = 0
-    var points = 0
-    contentParts?.forEach(part => {
-        if (part.includes("WORDS")) {
-            words = Number(part.replace("WORDS:", "").trim())
-        }
-
-        if (part.includes("PANGRAMS")) {
-            const pangramParts = part.split("(")
-            pangrams = Number(pangramParts[0].replace("PANGRAMS:", "").trim())
-
-            if (pangramParts.length === 2) {
-                perfectPangrams = Number(
-                    pangramParts[1].replace("Perfect)", "").trim()
-                )
-            }
-        }
-
-        if (part.includes("POINTS")) {
-            points = Number(part.replace("POINTS:", "").trim())
-        }
-    })
-
-    return {
-        words: words,
-        pangrams: pangrams,
-        perfectPangrams: perfectPangrams,
-        points: points
-    }
+    const date = new Date(gameDateString);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}/${month}/${day}`;
 }
 
 function parseBeePhoto(doc: Document): BeePhoto {
-    const pictureElement = doc.getElementsByTagName("picture")
+    const pictureElement = doc.getElementsByTagName("picture");
     if (pictureElement == null || pictureElement.length !== 1) {
-        throw new Error("Failed to find bee picture element.")
+        throw new Error("Failed to find bee picture element.");
     }
 
-    const beeImage = pictureElement[0].getElementsByTagName("img")
+    const beeImage = pictureElement[0].getElementsByTagName("img");
     if (beeImage == null || beeImage.length !== 1) {
-        throw new Error("Failed to find bee image.")
+        throw new Error("Failed to find bee image.");
     }
 
-    const figCaptionElement = doc.getElementsByTagName("figCaption")
+    const figCaptionElement = doc.getElementsByTagName("figCaption");
     if (figCaptionElement == null || figCaptionElement.length !== 1) {
-        throw new Error("Failed to find bee picture credit element.")
+        throw new Error("Failed to find bee picture credit element.");
     }
 
-    var credit = ""
-    const beeImageCredit = figCaptionElement[0].getElementsByTagName("span")
+    let credit = "";
+    const beeImageCredit = figCaptionElement[0].getElementsByTagName("span");
     for (let i = 1; i < beeImageCredit.length; i++) {
-        const content = beeImageCredit[i].innerText ?? ""
-        if (!content.includes("Courtesy of")) {
-            continue
-        }
-
-        credit = content
-        break
+        const content = beeImageCredit[i].innerText ?? "";
+        if (!content.includes("Courtesy of")) continue;
+        credit = content;
+        break;
     }
 
     return {
         src: beeImage[0].getAttribute("src") ?? "",
         srcset: beeImage[0].getAttribute("srcset") ?? "",
-        credit: credit
-    }
+        credit,
+    };
 }

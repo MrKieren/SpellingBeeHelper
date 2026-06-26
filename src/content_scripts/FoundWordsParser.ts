@@ -34,7 +34,7 @@ export function updateFoundWords(): FoundWordsData {
         const child = words[index]
 
         const word = extractWordFromElement(child)
-        const firstLetter = word[0]
+        const firstLetter = word[0].toUpperCase()
 
         if (!letterCounts.has(firstLetter)) {
             letterCounts.set(firstLetter, new Map<number, number>())
@@ -48,7 +48,7 @@ export function updateFoundWords(): FoundWordsData {
             letterCounts.get(firstLetter)?.get(word.length) ?? 0
         letterCounts.get(firstLetter)?.set(word.length, letterCount + 1)
 
-        const firstTwoLetters = word[0] + word[1]
+        const firstTwoLetters = (word[0] + word[1]).toUpperCase()
         if (!twoLetterCounts.has(firstTwoLetters)) {
             twoLetterCounts.set(firstTwoLetters, 0)
         }
